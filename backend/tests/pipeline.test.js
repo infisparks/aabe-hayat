@@ -321,8 +321,8 @@ async function runTests() {
 
     const res = await makeRequest('POST', '/api/orders/create', tamperedPayload);
     assert.strictEqual(res.status, 201);
-    assert.strictEqual(res.body.data.pricing.total, 850); // Server computed authoritative price (699 + 151 live shipping)
-    assert.strictEqual(res.body.data.amount, 85000); // 85000 paise
+    assert.strictEqual(res.body.data.pricing.total, 664); // Server computed authoritative price (699 - 5% online discount = 664, free shipping)
+    assert.strictEqual(res.body.data.amount, 66400); // 66400 paise
   });
 
   // SCENARIO 8: Invalid SKU -> backend rejects with 400 Bad Request
@@ -576,7 +576,7 @@ async function runTests() {
   await test('Scenario 19: Coupon Code RAB112 -> 12% discount for subtotal >= 999', async () => {
     const catalogService = require('../services/catalogService');
     
-    // Subtotal >= 999 -> 12% discount + 100% Free Shipping for Online
+    // Subtotal >= 999 -> 12% discount + 100% Free Shipping + 5% online discount
     const validQuote = await catalogService.buildTrustedOrderItems([
       { sku: 'fati_001', quantity: 2 }
     ], '400001', 'RAB112', 'razorpay');
@@ -584,19 +584,27 @@ async function runTests() {
     assert.strictEqual(validQuote.pricing.subtotal, 1398);
     assert.strictEqual(validQuote.pricing.discount, 168); // 12% of 1398 = 167.76 ~ 168
     assert.strictEqual(validQuote.pricing.couponCode, 'RAB112');
-    assert.strictEqual(validQuote.pricing.shipping, 0); // 100% Free shipping for Online payment
-    assert.strictEqual(validQuote.pricing.onlineDiscount, 0); // No 5% discount
-    assert.strictEqual(validQuote.pricing.total, 1230); // 1398 - 168 = 1230
+    assert.strictEqual(validQuote.pricing.shipping, 0); // 100% Free shipping for orders >= 699
+    assert.strictEqual(validQuote.pricing.onlineDiscount, 70); // 5% of 1398 = 69.9 ~ 70
+    assert.strictEqual(validQuote.pricing.total, 1160); // 1398 - 168 - 70 = 1160
 
-    // Subtotal with COD payment -> standard courier shipping fee (₹40)
+    // Subtotal with COD payment -> Free shipping for orders >= 699
     const codQuote = await catalogService.buildTrustedOrderItems([
       { sku: 'fati_001', quantity: 1 }
     ], '400001', null, 'cod');
     assert.strictEqual(codQuote.pricing.subtotal, 699);
-    assert.strictEqual(codQuote.pricing.shipping, 40);
+    assert.strictEqual(codQuote.pricing.shipping, 0); // Free shipping for >= 699 on COD too
     assert.strictEqual(codQuote.pricing.codCharge, 0);
     assert.strictEqual(codQuote.pricing.onlineDiscount, 0);
-    assert.strictEqual(codQuote.pricing.total, 739); // 699 + 40 = 739
+    assert.strictEqual(codQuote.pricing.total, 699); // 699
+
+    // Subtotal < 699 with COD payment -> Dynamic shipping applies
+    const codUnder699 = await catalogService.buildTrustedOrderItems([
+      { sku: 'fati_002', quantity: 1 } // 559
+    ], '400001', null, 'cod');
+    assert.strictEqual(codUnder699.pricing.subtotal, 559);
+    assert.strictEqual(typeof codUnder699.pricing.shipping, 'number');
+    assert.ok(codUnder699.pricing.shipping > 0);
 
     // Subtotal < 999 -> throws COUPON_MIN_AMOUNT_NOT_MET
     let thrownErr = null;
