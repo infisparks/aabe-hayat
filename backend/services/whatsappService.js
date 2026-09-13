@@ -18,7 +18,7 @@ function sanitizePhone(phone) {
 }
 
 /**
- * Calculate and format estimated delivery date as +2 days from base date.
+ * Calculate and format estimated delivery date as +4 days from base date.
  */
 function formatEstimatedDeliveryDate(baseDate) {
   const d = baseDate ? new Date(baseDate) : new Date();
@@ -174,7 +174,7 @@ async function sendOrderConfirmationWhatsApp(order) {
     `💰 *Total Amount:* ₹${totalAmount}\n\n` +
     `📦 *Items Ordered:*\n${itemsList}\n\n` +
     `📍 *Delivery Address:* ${customerName}, ${addressStr}\n\n` +
-    `🚚 *Estimated Delivery Date:* *${deliveryDate}* (Within 2 Days)\n\n` +
+    `🚚 *Estimated Delivery Date:* *${deliveryDate}* (Within 4 Days)\n\n` +
     `We are preparing your parcel for prompt dispatch. You will receive tracking updates here once shipped! ❤️\n\n` +
     `📞 *For Support / Help Call:* +91 99703 47703\n` +
     `*Fatima Calligrapher Team*`;
@@ -198,7 +198,7 @@ async function sendShippingConfirmationWhatsApp(order) {
     `Your order *#${order.orderId}* is on its way!\n\n` +
     `📦 *Courier Partner:* ${courier}\n` +
     `🔖 *AWB / Tracking Code:* ${awb}\n` +
-    `🗓️ *Estimated Delivery:* *${deliveryDate}* (Within 2 Days)\n` +
+    `🗓️ *Estimated Delivery:* *${deliveryDate}* (Within 4 Days)\n` +
     `🔗 *Live Tracking Link:* ${trackingUrl}\n\n` +
     `📞 *Customer Support:* +91 99703 47703\n\n` +
     `Thank you for choosing *Fatima Calligrapher*! ✨`;
