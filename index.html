@@ -42,8 +42,9 @@
 
     <!-- Ultra-Fast Preload for Critical WebP Assets -->
     <link rel="preload" as="image" href="product/hero.webp" fetchpriority="high">
-    <link rel="preload" as="image" href="product/offer/699freeshipping.webp" fetchpriority="high">
-    <link rel="preload" as="image" href="product/offer/50percentoff.webp?v=2">
+    <link rel="preload" as="image" href="product/offer/banner1.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="product/offer/banner2.webp">
+    <link rel="preload" as="image" href="product/offer/699freeshipping.webp">
     <link rel="preload" as="image" href="product/umrah_card_urdu.webp">
     <link rel="preload" as="image" href="product/umrah_card_english.webp">
     <link rel="preload" as="image" href="product/cardoffer.webp">
@@ -291,22 +292,30 @@
                 </span>
             </div>
 
-            <!-- HERO SPECIAL OFFER SHOWCASE (Desktop: 2 Side-by-Side | Mobile: Half-Screen Auto-Slider, 100% Uncropped) -->
-            <div class="w-full max-w-4xl mx-auto my-1.5 sm:my-4">
-                <!-- DESKTOP / PC VIEW: Show remaining 2 banners side-by-side in one view (Full Uncropped) -->
-                <div class="hidden md:grid md:grid-cols-2 gap-4 lg:gap-6 items-center">
-                    <!-- Banner 1: Free Shipping on Orders 699+ -->
+            <!-- HERO SPECIAL OFFER SHOWCASE (Desktop: 3 Side-by-Side | Mobile: Half-Screen Auto-Slider, 100% Uncropped) -->
+            <div class="w-full max-w-5xl mx-auto my-1.5 sm:my-4">
+                <!-- DESKTOP / PC VIEW: Show all 3 banners side-by-side in one view (Full Uncropped) -->
+                <div class="hidden md:grid md:grid-cols-3 gap-3.5 lg:gap-4 items-center">
+                    <!-- Banner 1: Special Offer 1 -->
                     <div onclick="openOfferCardModal()" class="group relative rounded-2xl overflow-hidden border border-gold-500/40 bg-black/40 backdrop-blur-xs shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:border-gold-400 hover:shadow-[0_12px_35px_rgba(197,154,63,0.25)] transition-all duration-300 cursor-pointer">
-                        <img src="product/offer/699freeshipping.webp" 
-                             alt="Special Offer - Free Shipping Above ₹699" 
+                        <img src="product/offer/banner1.webp" 
+                             alt="Special Offer - Fatima Calligrapher" 
                              fetchpriority="high" decoding="async" 
                              width="1200" height="900"
                              class="w-full h-auto object-contain rounded-2xl block group-hover:scale-[1.01] transition-transform duration-500">
                     </div>
-                    <!-- Banner 2: Up to 50% OFF -->
+                    <!-- Banner 2: Special Offer 2 -->
                     <div onclick="openOfferCardModal()" class="group relative rounded-2xl overflow-hidden border border-gold-500/40 bg-black/40 backdrop-blur-xs shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:border-gold-400 hover:shadow-[0_12px_35px_rgba(197,154,63,0.25)] transition-all duration-300 cursor-pointer">
-                        <img src="product/offer/50percentoff.webp?v=2" 
-                             alt="Special Offer - 50% OFF Umrah Dua Cards" 
+                        <img src="product/offer/banner2.webp" 
+                             alt="Special Offer - Fatima Calligrapher" 
+                             decoding="async" 
+                             width="1200" height="900"
+                             class="w-full h-auto object-contain rounded-2xl block group-hover:scale-[1.01] transition-transform duration-500">
+                    </div>
+                    <!-- Banner 3: Free Shipping on Orders 699+ -->
+                    <div onclick="openOfferCardModal()" class="group relative rounded-2xl overflow-hidden border border-gold-500/40 bg-black/40 backdrop-blur-xs shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:border-gold-400 hover:shadow-[0_12px_35px_rgba(197,154,63,0.25)] transition-all duration-300 cursor-pointer">
+                        <img src="product/offer/699freeshipping.webp" 
+                             alt="Special Offer - Free Shipping Above ₹699" 
                              decoding="async" 
                              width="1200" height="900"
                              class="w-full h-auto object-contain rounded-2xl block group-hover:scale-[1.01] transition-transform duration-500">
@@ -319,15 +328,22 @@
                     <div class="overflow-hidden rounded-xl border border-gold-500/40 bg-black/40 backdrop-blur-xs shadow-[0_6px_20px_rgba(0,0,0,0.5)]">
                         <div id="hero-carousel-track" class="flex transition-transform duration-500 ease-out cursor-pointer w-full" onclick="openOfferCardModal()">
                             <div class="w-full flex-shrink-0">
-                                <img src="product/offer/699freeshipping.webp" 
-                                     alt="Special Offer - Free Shipping Above ₹699" 
+                                <img src="product/offer/banner1.webp" 
+                                     alt="Special Offer - Fatima Calligrapher" 
                                      fetchpriority="high" decoding="async" 
                                      width="1200" height="900"
                                      class="w-full h-auto object-contain rounded-xl block">
                             </div>
                             <div class="w-full flex-shrink-0">
-                                <img src="product/offer/50percentoff.webp?v=2" 
-                                     alt="Special Offer - 50% OFF Umrah Dua Cards" 
+                                <img src="product/offer/banner2.webp" 
+                                     alt="Special Offer - Fatima Calligrapher" 
+                                     decoding="async" 
+                                     width="1200" height="900"
+                                     class="w-full h-auto object-contain rounded-xl block">
+                            </div>
+                            <div class="w-full flex-shrink-0">
+                                <img src="product/offer/699freeshipping.webp" 
+                                     alt="Special Offer - Free Shipping Above ₹699" 
                                      decoding="async" 
                                      width="1200" height="900"
                                      class="w-full h-auto object-contain rounded-xl block">
@@ -343,10 +359,120 @@
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
 
-                    <!-- Luxury Indicators (2 Slides) -->
+                    <!-- Luxury Indicators (3 Slides) -->
                     <div class="flex items-center justify-center gap-1.5 mt-1.5">
                         <button type="button" onclick="setHeroSlide(0)" class="hero-dot h-1 rounded-full transition-all duration-300 w-5 bg-gold-400 shadow-sm" aria-label="Offer 1"></button>
                         <button type="button" onclick="setHeroSlide(1)" class="hero-dot h-1 rounded-full transition-all duration-300 w-1.5 bg-white/30 hover:bg-white/60" aria-label="Offer 2"></button>
+                        <button type="button" onclick="setHeroSlide(2)" class="hero-dot h-1 rounded-full transition-all duration-300 w-1.5 bg-white/30 hover:bg-white/60" aria-label="Offer 3"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HERO PILGRIM REVIEWS STRIP (Mobile: 3 Visible in 1 Row | Auto-Scrollable + Touch Drag | Tap for Fullscreen) -->
+            <div class="w-full max-w-5xl mx-auto my-2 xs:my-2.5 sm:my-3.5 px-0.5 sm:px-2">
+                <!-- Mini Header: Trust Badge + Tap to Zoom -->
+                <div class="flex items-center justify-between px-1.5 mb-1.5">
+                    <div class="flex items-center gap-1.5">
+                        <div class="flex text-amber-400 text-[10px] sm:text-xs">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-[11px] sm:text-xs font-bold text-gold-300">Customer Reviews</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 text-[8.5px] font-bold px-1.5 py-0.2 rounded-full hidden xs:inline-flex items-center gap-0.5">
+                            <i class="fa-solid fa-circle-check text-[7.5px]"></i> 100% Real
+                        </span>
+                    </div>
+                    <span class="text-[9.5px] sm:text-[10.5px] text-gold-400/90 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-magnifying-glass-plus text-gold-400"></i> Tap to Fullscreen
+                    </span>
+                </div>
+
+                <!-- Auto-Scrollable Review Track Container (3 cards visible on mobile, 6 on desktop) -->
+                <div class="relative group/reviews" id="hero-reviews-wrapper">
+                    <!-- Left / Right Nav Arrows for Desktop -->
+                    <button type="button" onclick="scrollHeroReviews(-1)" aria-label="Previous Reviews" class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-7 h-7 rounded-full bg-black/85 border border-gold-500/50 text-gold-300 hover:text-white items-center justify-center text-xs shadow-lg transition-all z-20 hover:scale-110 cursor-pointer">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button type="button" onclick="scrollHeroReviews(1)" aria-label="Next Reviews" class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-7 h-7 rounded-full bg-black/85 border border-gold-500/50 text-gold-300 hover:text-white items-center justify-center text-xs shadow-lg transition-all z-20 hover:scale-110 cursor-pointer">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <!-- Horizontal Scrolling Container -->
+                    <div id="hero-reviews-track" class="flex items-center gap-1.5 xs:gap-2 overflow-x-auto no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing select-none py-1" style="scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;">
+                        <div onclick="openReviewLightbox(0)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-01.webp" alt="Pilgrim Review 1" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(1)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-02.webp" alt="Pilgrim Review 2" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(2)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-03.webp" alt="Pilgrim Review 3" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(3)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-04.webp" alt="Pilgrim Review 4" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(4)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-05.webp" alt="Pilgrim Review 5" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(5)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-06.webp" alt="Pilgrim Review 6" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(6)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-07.webp" alt="Pilgrim Review 7" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(7)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-08.webp" alt="Pilgrim Review 8" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(8)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-09.webp" alt="Pilgrim Review 9" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(9)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-10.webp" alt="Pilgrim Review 10" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(10)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-11.webp" alt="Pilgrim Review 11" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(11)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-12.webp" alt="Pilgrim Review 12" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(12)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-13.webp" alt="Pilgrim Review 13" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(13)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-14.webp" alt="Pilgrim Review 14" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
+                        <div onclick="openReviewLightbox(14)" class="group relative rounded-xl overflow-hidden border border-gold-500/35 bg-black/60 backdrop-blur-xs shadow-sm hover:border-gold-400 hover:shadow-gold-glow transition-all duration-300 cursor-pointer flex-shrink-0 w-[31.3%] sm:w-[19%] md:w-[15.5%] h-28 xs:h-32 sm:h-36 flex items-center justify-center" style="scroll-snap-align: start;">
+                            <img src="product/reviews/review-15.webp" alt="Pilgrim Review 15" loading="lazy" decoding="async" width="220" height="320" class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none"></div>
+                            <span class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-xs text-gold-400 text-[8px] font-extrabold px-1 py-0.2 rounded border border-gold-500/30 flex items-center gap-0.5"><i class="fa-solid fa-star text-amber-400 text-[7px]"></i> 5.0</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -909,6 +1035,43 @@
                     ✨ Automatically applies coupon RAB112 for 12% OFF on orders ≥ ₹999 + FREE Delivery!
                 </div>
             </div>
+    <!-- FULLSCREEN CUSTOMER REVIEW LIGHTBOX MODAL -->
+    <div id="review-lightbox-modal" onclick="if(event.target === this) closeReviewLightbox()" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex flex-col items-center justify-between p-2 sm:p-4 opacity-0 transition-opacity duration-300 select-none">
+        <!-- Top Toolbar -->
+        <div class="w-full max-w-xl flex items-center justify-between px-3 py-2 text-white z-20">
+            <div class="flex items-center gap-2">
+                <span class="bg-gold-500/20 text-gold-300 border border-gold-500/40 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Verified Pilgrim Review
+                </span>
+                <span id="review-lightbox-counter" class="text-xs text-gray-300 font-semibold">1 / 15</span>
+            </div>
+            <button onclick="closeReviewLightbox()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-gold-500 hover:text-onyx text-white flex items-center justify-center text-sm transition-all shadow-md active:scale-95 cursor-pointer" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Main Image Showcase with Prev / Next Navigation -->
+        <div class="relative w-full max-w-xl flex-1 flex items-center justify-center p-1 sm:p-2 min-h-0">
+            <button onclick="navigateReviewLightbox(-1)" aria-label="Previous Review" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 hover:bg-gold-500 text-gold-300 hover:text-onyx border border-gold-500/50 flex items-center justify-center text-sm sm:text-base transition-all z-20 shadow-xl active:scale-90 cursor-pointer">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button onclick="navigateReviewLightbox(1)" aria-label="Next Review" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 hover:bg-gold-500 text-gold-300 hover:text-onyx border border-gold-500/50 flex items-center justify-center text-sm sm:text-base transition-all z-20 shadow-xl active:scale-90 cursor-pointer">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <!-- Active Fullscreen Review Image -->
+            <img id="review-lightbox-img" src="" alt="Customer Review Fullscreen" class="max-h-[78vh] max-w-[92vw] object-contain rounded-2xl border border-gold-500/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-all duration-200">
+        </div>
+
+        <!-- Bottom Action CTA & Hint -->
+        <div class="w-full max-w-xl px-3 py-2 flex items-center justify-between gap-2 z-20">
+            <span class="text-[10px] sm:text-xs text-gray-400 flex items-center gap-1">
+                <i class="fa-solid fa-arrows-left-right text-gold-400"></i> Swipe left/right to view more
+            </span>
+            <a href="#products-grid" onclick="closeReviewLightbox()" class="gold-btn-shimmer gold-bg-gradient text-onyx font-extrabold text-xs py-2 px-4 rounded-xl shadow-gold-glow flex items-center gap-1 hover:opacity-95 active:scale-95 transition-transform whitespace-nowrap">
+                <span>SHOP NOW</span>
+                <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            </a>
         </div>
     </div>
 
@@ -4856,6 +5019,130 @@
             startAutoSlide();
         }
 
+        // ==========================================
+        // HERO REVIEWS AUTO-SCROLLER & FULLSCREEN LIGHTBOX
+        // ==========================================
+        const HERO_REVIEWS = [
+            "product/reviews/review-01.webp",
+            "product/reviews/review-02.webp",
+            "product/reviews/review-03.webp",
+            "product/reviews/review-04.webp",
+            "product/reviews/review-05.webp",
+            "product/reviews/review-06.webp",
+            "product/reviews/review-07.webp",
+            "product/reviews/review-08.webp",
+            "product/reviews/review-09.webp",
+            "product/reviews/review-10.webp",
+            "product/reviews/review-11.webp",
+            "product/reviews/review-12.webp",
+            "product/reviews/review-13.webp",
+            "product/reviews/review-14.webp",
+            "product/reviews/review-15.webp"
+        ];
+
+        let activeReviewIdx = 0;
+        let isReviewLightboxOpen = false;
+        let reviewAutoScrollTimer = null;
+        let isReviewUserInteracting = false;
+        let reviewResumeTimeout = null;
+
+        function initHeroReviews() {
+            const track = document.getElementById('hero-reviews-track');
+            if (!track) return;
+
+            function startReviewAutoScroll() {
+                if (reviewAutoScrollTimer) return;
+                reviewAutoScrollTimer = setInterval(() => {
+                    if (isReviewUserInteracting || isReviewLightboxOpen) return;
+                    if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
+                        track.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        track.scrollBy({ left: 110, behavior: 'smooth' });
+                    }
+                }, 2600);
+            }
+
+            function pauseReviewAutoScroll() {
+                isReviewUserInteracting = true;
+                if (reviewResumeTimeout) clearTimeout(reviewResumeTimeout);
+                reviewResumeTimeout = setTimeout(() => {
+                    isReviewUserInteracting = false;
+                }, 4000);
+            }
+
+            track.addEventListener('touchstart', pauseReviewAutoScroll, { passive: true });
+            track.addEventListener('touchmove', pauseReviewAutoScroll, { passive: true });
+            track.addEventListener('wheel', pauseReviewAutoScroll, { passive: true });
+            track.addEventListener('mouseenter', () => { isReviewUserInteracting = true; });
+            track.addEventListener('mouseleave', () => {
+                if (reviewResumeTimeout) clearTimeout(reviewResumeTimeout);
+                reviewResumeTimeout = setTimeout(() => { isReviewUserInteracting = false; }, 1500);
+            });
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startReviewAutoScroll();
+                        } else {
+                            if (reviewAutoScrollTimer) {
+                                clearInterval(reviewAutoScrollTimer);
+                                reviewAutoScrollTimer = null;
+                            }
+                        }
+                    });
+                }, { threshold: 0.05 });
+                observer.observe(track);
+            } else {
+                startReviewAutoScroll();
+            }
+        }
+
+        window.scrollHeroReviews = function(direction) {
+            const track = document.getElementById('hero-reviews-track');
+            if (track) {
+                const scrollAmount = track.clientWidth * 0.7 * direction;
+                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        };
+
+        window.openReviewLightbox = function(idx) {
+            activeReviewIdx = (idx + HERO_REVIEWS.length) % HERO_REVIEWS.length;
+            const modal = document.getElementById('review-lightbox-modal');
+            const img = document.getElementById('review-lightbox-img');
+            const counter = document.getElementById('review-lightbox-counter');
+            if (!modal || !img) return;
+
+            img.src = HERO_REVIEWS[activeReviewIdx];
+            if (counter) counter.textContent = `${activeReviewIdx + 1} / ${HERO_REVIEWS.length}`;
+
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+            });
+            document.body.style.overflow = 'hidden';
+            isReviewLightboxOpen = true;
+        };
+
+        window.closeReviewLightbox = function() {
+            const modal = document.getElementById('review-lightbox-modal');
+            if (!modal) return;
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                isReviewLightboxOpen = false;
+            }, 250);
+        };
+
+        window.navigateReviewLightbox = function(dir) {
+            window.openReviewLightbox(activeReviewIdx + dir);
+        };
+
+        let lightboxTouchStartX = 0;
+
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const directProdId = urlParams.get('id') || urlParams.get('product') || urlParams.get('p');
@@ -4865,12 +5152,35 @@
             }
 
             initHeroOfferCarousel();
+            initHeroReviews();
             renderProducts('all');
             renderDuas('all');
             renderJourneyNav();
             renderJourneyStage();
             setupJourneyTouchSwipe();
             restoreCustomerDetailsFromStorage();
+
+            const lightboxModal = document.getElementById('review-lightbox-modal');
+            if (lightboxModal) {
+                lightboxModal.addEventListener('touchstart', (e) => {
+                    lightboxTouchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                lightboxModal.addEventListener('touchend', (e) => {
+                    const diff = lightboxTouchStartX - e.changedTouches[0].screenX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) window.navigateReviewLightbox(1);
+                        else window.navigateReviewLightbox(-1);
+                    }
+                }, { passive: true });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (!isReviewLightboxOpen) return;
+                if (e.key === 'Escape') window.closeReviewLightbox();
+                if (e.key === 'ArrowLeft') window.navigateReviewLightbox(-1);
+                if (e.key === 'ArrowRight') window.navigateReviewLightbox(1);
+            });
 
             const slider = document.getElementById('dua-slider-container');
             if (slider) {
