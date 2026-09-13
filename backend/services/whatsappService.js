@@ -128,7 +128,7 @@ async function sendAdminOrderNotificationWhatsApp(order) {
     `• *Address:* ${addressStr}\n\n` +
     `🛍️ *Ordered Products:*\n${itemsList}\n\n` +
     `📦 *Shipment Status:* ${order.shipping?.status || 'NOT_BOOKED'} ${order.shipping?.awb ? `(AWB: ${order.shipping.awb})` : ''}\n` +
-    `🚚 *Est. Delivery Date (+2 days):* ${deliveryDate}\n` +
+    `🚚 *Est. Delivery Date (+4 days):* ${deliveryDate}\n` +
     `📞 *Support Helpline:* +91 99703 47703\n` +
     `⏰ *Booking Time:* ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
 
