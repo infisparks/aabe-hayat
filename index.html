@@ -247,10 +247,10 @@
                 <a href="#reviews" class="hidden md:flex items-center gap-1 text-amber-400 text-xs font-semibold bg-white/5 px-2.5 py-1 rounded-full border border-gold-500/20">
                     <i class="fa-solid fa-star text-[10px]"></i> 4.9 (2,800+ Pilgrims)
                 </a>
-                <button onclick="toggleCartDrawer()" class="relative p-2 text-gold-400 hover:text-white transition-colors cursor-pointer" aria-label="Open Cart">
+                <a href="checkout.html" class="relative p-2 text-gold-400 hover:text-white transition-colors cursor-pointer" aria-label="Open Cart / Checkout">
                     <i class="fa-solid fa-bag-shopping text-xl"></i>
                     <span id="cart-count" class="absolute -top-0.5 -right-0.5 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-onyx">0</span>
-                </button>
+                </a>
             </div>
         </div>
     </header>
@@ -1543,10 +1543,10 @@
                     <div class="text-xs text-gold-400 font-extrabold" id="sticky-cart-total">Total: Rs. 0</div>
                 </div>
             </div>
-            <button onclick="toggleCartDrawer(true)" class="gold-bg-gradient text-onyx font-extrabold text-xs sm:text-sm py-2.5 px-5 rounded-xl shadow-gold-glow flex items-center gap-2 hover:opacity-95 active:scale-95 transition-transform whitespace-nowrap">
-                <span>VIEW CART</span>
+            <a href="checkout.html" class="gold-bg-gradient text-onyx font-extrabold text-xs sm:text-sm py-2.5 px-5 rounded-xl shadow-gold-glow flex items-center gap-2 hover:opacity-95 active:scale-95 transition-transform whitespace-nowrap">
+                <span>VIEW CART / CHECKOUT</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
-            </button>
+            </a>
         </div>
     </div>
 
@@ -2007,7 +2007,7 @@
             closeOfferCardModal();
             applyCouponCode('RAB112');
             showToastNotification('🎉 Coupon RAB112 Applied! Add 2 or more products (Total ₹999+) for 12% OFF + FREE Delivery!');
-            toggleCartDrawer(true);
+            window.location.href = 'checkout.html';
         }
 
         function applyOfferComboAndOpen() {
@@ -2699,7 +2699,7 @@
 
         function buyNow(productId, variantIndex = 0) {
             addToCart(productId, variantIndex);
-            toggleCartDrawer(true);
+            window.location.href = 'checkout.html';
         }
 
         function showToast(productName) {
@@ -2715,7 +2715,7 @@
                     <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
                     <span class="truncate"><b>${productName}</b> added!</span>
                 </div>
-                <button onclick="toggleCartDrawer(true)" class="bg-gold-500 text-onyx px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-gold-400 whitespace-nowrap">View Cart</button>
+                <a href="checkout.html" class="bg-gold-500 text-onyx px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-gold-400 whitespace-nowrap">View Cart</a>
             `;
 
             toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');

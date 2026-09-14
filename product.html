@@ -162,11 +162,11 @@
             </a>
 
             <!-- Right: Cart Trigger Button -->
-            <button onclick="toggleCartDrawer(true)" class="relative flex items-center gap-1.5 bg-onyx text-gold-400 hover:bg-gold-500 hover:text-onyx px-3 py-1.5 rounded-xl border border-gold-500/40 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer">
+            <a href="checkout.html" class="relative flex items-center gap-1.5 bg-onyx text-gold-400 hover:bg-gold-500 hover:text-onyx px-3 py-1.5 rounded-xl border border-gold-500/40 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="hidden sm:inline">Cart</span>
                 <span id="cart-count" class="bg-gold-500 text-onyx font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
-            </button>
+            </a>
         </div>
     </header>
 
@@ -1959,15 +1959,33 @@
 
         function buyPdpProductNow() {
             addPdpProductToCart();
-            toggleCartDrawer(true);
+            window.location.href = 'checkout.html';
         }
 
         function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-onyx text-pearl border border-gold-400/60 py-2.5 px-4 rounded-2xl shadow-gold-glow flex items-center gap-3 text-xs font-semibold';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>${msg}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 2500);
+            let toast = document.getElementById('cart-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'cart-toast';
+                toast.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-onyx text-pearl border border-gold-400/60 py-2.5 px-4 rounded-2xl shadow-gold-glow flex items-center gap-3 text-xs font-semibold transition-all transform duration-300 translate-y-12 opacity-0 pointer-events-none w-[90%] max-w-sm justify-between';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `
+                <div class="flex items-center gap-2 truncate">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                    <span class="truncate">${msg}</span>
+                </div>
+                <a href="checkout.html" class="bg-gold-500 text-onyx px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-gold-400 whitespace-nowrap">View Cart</a>
+            `;
+
+            toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(window._cartToastTimer);
+            window._cartToastTimer = setTimeout(() => {
+                toast.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
         }
 
         function toggleCartDrawer(forceOpen = false) {
