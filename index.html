@@ -1901,6 +1901,29 @@
         ];
 
         let cart = [];
+
+        function saveCartToStorage() {
+            try {
+                localStorage.setItem('fc_cart_items', JSON.stringify(cart));
+            } catch (e) {
+                console.error("Error saving cart:", e);
+            }
+        }
+
+        function loadCartFromStorage() {
+            try {
+                const saved = localStorage.getItem('fc_cart_items');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        cart = parsed;
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading cart:", e);
+            }
+        }
+
         let currentQuickViewProduct = null;
         let currentSelectedVariant = 0;
         let currentSlideIndex = 0;
@@ -2661,6 +2684,7 @@
                 });
             }
 
+            saveCartToStorage();
             updateCartUI();
             const displayName = variant ? `${product.name} (${variant.shortName})` : product.name;
             showToast(displayName);
@@ -2913,6 +2937,7 @@
                 item.qty += delta;
                 if (item.qty <= 0) cart = cart.filter(i => i.cartKey !== cartKey);
             }
+            saveCartToStorage();
             updateCartUI(true);
         }
 
@@ -3160,6 +3185,7 @@
 
             // Reset cart state
             cart = [];
+            saveCartToStorage();
             updateCartUI();
             toggleCartDrawer(false);
             document.getElementById('success-modal').classList.remove('hidden');
@@ -5146,6 +5172,8 @@
             renderJourneyStage();
             setupJourneyTouchSwipe();
             restoreCustomerDetailsFromStorage();
+            loadCartFromStorage();
+            updateCartUI(false);
 
             const lightboxModal = document.getElementById('review-lightbox-modal');
             if (lightboxModal) {
@@ -5174,6 +5202,19 @@
                 slider.addEventListener('scroll', updateDuaSlideCounter, { passive: true });
             }
 
+        });
+
+        // Ensure cart is fresh on back navigation and tab switching
+        window.addEventListener('pageshow', () => {
+            loadCartFromStorage();
+            updateCartUI(false);
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'fc_cart_items') {
+                loadCartFromStorage();
+                updateCartUI(false);
+            }
         });
     </script>
 

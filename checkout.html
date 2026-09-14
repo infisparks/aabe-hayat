@@ -716,6 +716,20 @@
             }
         });
 
+        // Ensure cart is fresh on back navigation and tab switching
+        window.addEventListener('pageshow', () => {
+            initCartFromParamsOrStorage();
+            renderCheckoutSummary();
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'fc_cart_items' || e.key === 'fc_customer_data' || e.key === 'fc_customer_details') {
+                initCartFromParamsOrStorage();
+                restoreCustomerDetails();
+                renderCheckoutSummary();
+            }
+        });
+
         async function checkAndLoadPendingOrder() {
             const params = new URLSearchParams(window.location.search);
             const orderId = params.get('orderId') || params.get('order');
@@ -785,31 +799,41 @@
             const prodId = parseInt(params.get('id') || params.get('product'), 10);
             const variantIdx = parseInt(params.get('variant'), 10);
 
+            // Restore existing cart from localStorage first
+            try {
+                const saved = localStorage.getItem('fc_cart_items');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        checkoutCart = parsed;
+                    }
+                }
+            } catch (e) {}
+
             if (prodId) {
                 // Direct product checkout parameter
                 const p = catalogProducts.find(prod => prod.id === prodId) || catalogProducts[1];
                 const hasVariants = p.variants && p.variants.length > 0;
                 const v = hasVariants ? (p.variants[!isNaN(variantIdx) ? variantIdx : 0] || p.variants[0]) : null;
+                const cartKey = v ? `${p.id}_${v.sku}` : `${p.id}_default`;
 
-                checkoutCart = [{
-                    cartKey: v ? `${p.id}_${v.sku}` : `${p.id}_default`,
-                    id: p.id,
-                    name: p.name,
-                    sku: v ? v.sku : p.sku,
-                    variantName: v ? v.shortName : '',
-                    price: v ? v.price : p.price,
-                    image: p.image,
-                    weightKg: v ? v.weightKg : (p.weightKg || 0.10),
-                    qty: 1
-                }];
+                if (!Array.isArray(checkoutCart)) checkoutCart = [];
+                const existing = checkoutCart.find(i => i.cartKey === cartKey);
+                if (!existing) {
+                    checkoutCart.push({
+                        cartKey: cartKey,
+                        id: p.id,
+                        name: p.name,
+                        sku: v ? v.sku : p.sku,
+                        variantName: v ? v.shortName : '',
+                        price: v ? v.price : p.price,
+                        image: p.image,
+                        weightKg: v ? v.weightKg : (p.weightKg || 0.10),
+                        qty: 1
+                    });
+                }
                 localStorage.setItem('fc_cart_items', JSON.stringify(checkoutCart));
             } else {
-                // Restore from localStorage
-                try {
-                    const saved = localStorage.getItem('fc_cart_items');
-                    if (saved) checkoutCart = JSON.parse(saved);
-                } catch (e) {}
-
                 // If still empty, default to English Card Standard Kit (Rs. 559)
                 if (!Array.isArray(checkoutCart) || checkoutCart.length === 0) {
                     const defProd = catalogProducts[1]; // English
@@ -825,22 +849,28 @@
                         weightKg: defVar.weightKg,
                         qty: 1
                     }];
+                    localStorage.setItem('fc_cart_items', JSON.stringify(checkoutCart));
                 }
             }
         }
 
         function restoreCustomerDetails() {
             try {
+                let data = null;
                 const raw = localStorage.getItem('fc_customer_data');
-                if (!raw) return;
-                const data = JSON.parse(raw);
-                if (data.name) document.getElementById('cust-name').value = data.name;
-                if (data.phone) document.getElementById('cust-phone').value = data.phone;
-                if (data.pincode) document.getElementById('cust-pincode').value = data.pincode;
-                if (data.city) document.getElementById('cust-city').value = data.city;
-                if (data.state) document.getElementById('cust-state').value = data.state;
-                if (data.address1) document.getElementById('cust-address1').value = data.address1;
-                if (data.address2) document.getElementById('cust-address2').value = data.address2;
+                if (raw) data = JSON.parse(raw);
+                if (!data) {
+                    const altRaw = localStorage.getItem('fc_customer_details');
+                    if (altRaw) data = JSON.parse(altRaw);
+                }
+                if (!data) return;
+                if (data.name && document.getElementById('cust-name')) document.getElementById('cust-name').value = data.name;
+                if (data.phone && document.getElementById('cust-phone')) document.getElementById('cust-phone').value = data.phone;
+                if (data.pincode && document.getElementById('cust-pincode')) document.getElementById('cust-pincode').value = data.pincode;
+                if (data.city && document.getElementById('cust-city')) document.getElementById('cust-city').value = data.city;
+                if (data.state && document.getElementById('cust-state')) document.getElementById('cust-state').value = data.state;
+                if (data.address1 && document.getElementById('cust-address1')) document.getElementById('cust-address1').value = data.address1;
+                if (data.address2 && document.getElementById('cust-address2')) document.getElementById('cust-address2').value = data.address2;
             } catch (e) {}
         }
 
@@ -856,6 +886,7 @@
             };
             try {
                 localStorage.setItem('fc_customer_data', JSON.stringify(data));
+                localStorage.setItem('fc_customer_details', JSON.stringify(data));
             } catch (e) {}
         }
 

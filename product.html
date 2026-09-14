@@ -616,10 +616,10 @@
                     </div>
                 </div>
 
-                <a href="checkout.html" id="checkout-submit-btn" class="w-full gold-bg-gradient text-onyx font-extrabold py-3 rounded-xl shadow-gold-glow flex items-center justify-center gap-2 text-xs active:scale-95 transition-all cursor-pointer">
+                <button id="checkout-submit-btn" onclick="processOrder()" class="w-full gold-bg-gradient text-onyx font-extrabold py-3 rounded-xl shadow-gold-glow flex items-center justify-center gap-2 text-xs active:scale-95 transition-all cursor-pointer">
                     <i class="fa-solid fa-lock text-xs"></i>
-                    <span id="checkout-btn-text">PROCEED TO SECURE CHECKOUT</span>
-                </a>
+                    <span id="checkout-btn-text">CONFIRM & PLACE ORDER (COD)</span>
+                </button>
 
                 <button onclick="toggleCartDrawer(false)" class="w-full bg-gray-100 hover:bg-gray-200 text-onyx font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors border border-gray-300 mt-2">
                     <i class="fa-solid fa-arrow-left text-xs text-gold-600"></i>
@@ -1166,6 +1166,29 @@
         let startX = 0, startY = 0, currentPanX = 0, currentPanY = 0;
 
         let cart = [];
+
+        function saveCartToStorage() {
+            try {
+                localStorage.setItem('fc_cart_items', JSON.stringify(cart));
+            } catch (e) {
+                console.error("Error saving cart:", e);
+            }
+        }
+
+        function loadCartFromStorage() {
+            try {
+                const saved = localStorage.getItem('fc_cart_items');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        cart = parsed;
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading cart:", e);
+            }
+        }
+
         let selectedPaymentMethod = 'cod';
         let isProcessingOrder = false;
         let activeTestOrderData = null;
@@ -1921,6 +1944,7 @@
                 });
             }
 
+            saveCartToStorage();
             updateCartUI(true);
             trackMetaEvent('AddToCart', {
                 content_name: p.name,
@@ -1935,7 +1959,7 @@
 
         function buyPdpProductNow() {
             addPdpProductToCart();
-            window.location.href = `checkout.html?id=${currentProduct.id}&variant=${currentVariantIndex}`;
+            toggleCartDrawer(true);
         }
 
         function showToast(msg) {
@@ -2064,6 +2088,7 @@
                 item.qty += delta;
                 if (item.qty <= 0) cart = cart.filter(i => i.cartKey !== cartKey);
             }
+            saveCartToStorage();
             updateCartUI(true);
         }
 
@@ -2476,6 +2501,7 @@
                     setCheckoutButtonLoading(false);
                     toggleCartDrawer(false);
                     cart = [];
+                    saveCartToStorage();
                     updateCartUI(true);
                     showSuccessOrder(orderData);
                     return;
@@ -2516,6 +2542,7 @@
                                 window.isProcessingOrder = false;
                                 toggleCartDrawer(false);
                                 cart = [];
+                                saveCartToStorage();
                                 updateCartUI(true);
                                 showSuccessOrder(verifyData.data || orderData);
                             } else {
@@ -2606,6 +2633,21 @@
             initProductFromUrl();
             initPdpTouchControls();
             restoreCustomerDetailsFromStorage();
+            loadCartFromStorage();
+            updateCartUI(false);
+        });
+
+        // Ensure cart stays synced on back-forward cache and tab switching
+        window.addEventListener('pageshow', () => {
+            loadCartFromStorage();
+            updateCartUI(false);
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'fc_cart_items') {
+                loadCartFromStorage();
+                updateCartUI(false);
+            }
         });
     </script>
 
