@@ -748,6 +748,7 @@
             firebase.initializeApp(firebaseConfig);
         }
         const auth = firebase.auth();
+        const WORKER_BASE = window.WORKER_API_URL || "https://aabe-hayat.infisparks.workers.dev";
 
         let currentAdminToken = null;
         let currentOrdersList = [];
@@ -1106,11 +1107,12 @@
             }
 
             try {
-                const response = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/toggle-delivered`, {
+                const response = await fetch(`${WORKER_BASE}/api/admin/orders/${encodeURIComponent(orderId)}/toggle-delivered`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentAdminToken}`
+                        'Authorization': `Bearer ${currentAdminToken}`,
+                        'X-Admin-Key': currentAdminToken
                     },
                     body: JSON.stringify({ markDelivered })
                 });
@@ -2274,11 +2276,12 @@
             saveBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> <span>Updating...</span>`;
 
             try {
-                const response = await fetch(`/api/admin/orders/${encodeURIComponent(currentChangeProductOrderId)}/change-product`, {
+                const response = await fetch(`${WORKER_BASE}/api/admin/orders/${encodeURIComponent(currentChangeProductOrderId)}/change-product`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentAdminToken}`
+                        'Authorization': `Bearer ${currentAdminToken}`,
+                        'X-Admin-Key': currentAdminToken
                     },
                     body: JSON.stringify({
                         newSku,
@@ -2332,11 +2335,12 @@
             if (!confirmed) return;
 
             try {
-                const response = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/move-to-shiprocket`, {
+                const response = await fetch(`${WORKER_BASE}/api/admin/orders/${encodeURIComponent(orderId)}/move-to-shiprocket`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentAdminToken}`
+                        'Authorization': `Bearer ${currentAdminToken}`,
+                        'X-Admin-Key': currentAdminToken
                     },
                     body: JSON.stringify({
                         convertToCod: !isAlreadyPaid
@@ -2381,11 +2385,12 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Cancelling...`;
 
             try {
-                const response = await fetch(`/api/admin/orders/${orderId}/cancel`, {
+                const response = await fetch(`${WORKER_BASE}/api/admin/orders/${encodeURIComponent(orderId)}/cancel`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentAdminToken}`
+                        'Authorization': `Bearer ${currentAdminToken}`,
+                        'X-Admin-Key': currentAdminToken
                     },
                     body: JSON.stringify({ reason })
                 });
@@ -2465,11 +2470,12 @@
             }
 
             try {
-                const response = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+                const response = await fetch(`${WORKER_BASE}/api/admin/orders/${encodeURIComponent(orderId)}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentAdminToken}`
+                        'Authorization': `Bearer ${currentAdminToken}`,
+                        'X-Admin-Key': currentAdminToken
                     },
                     body: JSON.stringify({ confirmText: 'DELETE' })
                 });

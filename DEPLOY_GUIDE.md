@@ -17,9 +17,9 @@ This project is 100% serverless and static. There are **no separate `.env` files
 3. Click **Edit Code**, delete whatever is inside, and paste the entire code from [`worker.js`](./worker.js).
 4. Click **Deploy**.
 5. Copy your worker URL (e.g. `https://aabe-hayat-api.your-account.workers.dev`).
-6. In [`index.html`](./index.html#L155), set your worker URL:
+6. In [`index.html`](./index.html#L155), your worker URL is already configured:
    ```javascript
-   window.CLOUDFLARE_WORKER_URL = "https://aabe-hayat-api.your-account.workers.dev";
+   window.CLOUDFLARE_WORKER_URL = "https://aabe-hayat.infisparks.workers.dev";
    ```
 
 ---
