@@ -3,6 +3,12 @@
 .env.*
 !.env.example
 
+# Cloudflare Worker Code & Config (Private - Do not push to GitHub)
+worker.js
+worker.*
+cloudflare-worker/
+wrangler.toml
+
 # Dependencies
 node_modules/
 npm-debug.log*
