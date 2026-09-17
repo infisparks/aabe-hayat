@@ -32,7 +32,7 @@ In your Cloudflare Worker dashboard:
    - `RAZORPAY_KEY_SECRET` (Your Razorpay Key Secret)
    - `SHIPROCKET_EMAIL` (Your Shiprocket login email)
    - `SHIPROCKET_PASSWORD` (Your Shiprocket password)
-   - `SHIPROCKET_PICKUP_LOCATION` (e.g. `work`)
+   - `SHIPROCKET_PICKUP_LOCATION` (warehouse)
 3. Click **Deploy / Save**. The worker will automatically read them immediately.
 
 ---
