@@ -233,26 +233,6 @@
             </div>
           </div>
 
-          <!-- Slide 3: 65 Ingredients Herb Grid -->
-          <div class="slide-item w-full flex-shrink-0 h-full flex items-center justify-center p-2 sm:p-4 relative group">
-            <div class="relative w-full h-full flex items-center justify-center">
-              <img src="./image/3.png" onerror="this.src='./image/3.png'" alt="65 Powerful Herbal Ingredients" class="w-full h-full object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-500" />
-              <div class="absolute bottom-2 left-2 bg-black/80 border border-amber-500/40 px-2 py-0.5 rounded-lg text-[9px] font-bold text-amber-300 backdrop-blur-md">
-                Ashwagandha • Shilajit • Kesar
-              </div>
-            </div>
-          </div>
-
-          <!-- Slide 4: Nutritional Facts & Lab Certification -->
-          <div class="slide-item w-full flex-shrink-0 h-full flex items-center justify-center p-2 sm:p-4 relative group">
-            <div class="relative w-full h-full flex items-center justify-center">
-              <img src="./image/4.png" onerror="this.src='./image/4.png'" alt="FSSAI, ISO & Halal Certifications" class="w-full h-full object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-500" />
-              <div class="absolute bottom-2 left-2 bg-black/80 border border-emerald-500/40 px-2 py-0.5 rounded-lg text-[9px] font-bold text-emerald-300 backdrop-blur-md">
-                FSSAI &amp; Halal Certified
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <!-- Carousel Navigation Arrows -->
@@ -269,11 +249,9 @@
             <div class="flex items-center space-x-1 pointer-events-auto">
               <button onclick="goToSlide(0)" class="slide-dot w-4 h-1.5 rounded-full bg-amber-400 transition-all"></button>
               <button onclick="goToSlide(1)" class="slide-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></button>
-              <button onclick="goToSlide(2)" class="slide-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></button>
-              <button onclick="goToSlide(3)" class="slide-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></button>
             </div>
             <span class="text-zinc-600 font-mono text-[9px]">•</span>
-            <span id="slideCounterLabel" class="text-[9px] font-mono font-bold text-amber-400">1/4</span>
+            <span id="slideCounterLabel" class="text-[9px] font-mono font-bold text-amber-400">1/2</span>
           </div>
         </div>
 
@@ -848,7 +826,7 @@
     let selectedPaymentMethod = "COD"; // "COD" or "RAZORPAY"
     let currentQty = 1;
     let currentSlide = 0;
-    const totalSlides = 4;
+    const totalSlides = 2;
 
     // Verified Firebase Configuration for aabe-hayat Realtime Database
     const firebaseConfig = {
