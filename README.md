@@ -1,6 +1,6 @@
-# 🌿 AAB-E-HAYAT™ Health Care Juice — Official Storefront & Cloudflare Worker
+# 🌿 AAB-E-HAYAT™ Botanical Drink — Official Storefront & Cloudflare Worker
 
-A high-converting, mobile-first single-product e-commerce application for **AAB-E-HAYAT™ Health Care Juice (500ml)** by Empire Global Herbal Science, backed by **Firebase Realtime Database** and a fast **Cloudflare Worker** serverless backend.
+A high-converting, mobile-first single-product e-commerce application for **AAB-E-HAYAT™ Natural Botanical Drink (500ml)** by Empire Global Herbal Science, backed by **Firebase Realtime Database** and a fast **Cloudflare Worker** serverless backend.
 
 All environment variables and secrets are managed directly inside the **Cloudflare Dashboard**. There is **no separate `.env` file, no `package.json`, and no `wrangler.toml`** required.
 
@@ -10,7 +10,7 @@ All environment variables and secrets are managed directly inside the **Cloudfla
 
 ```
 aabe-hayyat/
-├── index.html              # Single-product landing page (Aab-E-Hayat Juice 500ml)
+├── index.html              # Single-product landing page (Aab-E-Hayat Botanical Drink 500ml)
 ├── admin.html              # Store admin management portal
 ├── image/                  # Product gallery images (1.png, 2.png, 3.png, 4.png)
 ├── worker.js               # Cloudflare Worker code (paste directly into Cloudflare)

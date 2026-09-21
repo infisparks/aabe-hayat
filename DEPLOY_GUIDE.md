@@ -1,4 +1,4 @@
-# Aab-E-Hayat Health Care Juice — Deployment Guide
+# Aab-E-Hayat Botanical Drink — Deployment Guide
 
 This project is 100% serverless and static. There are **no separate `.env` files, no `package.json`, and no `wrangler.toml`** required. Everything is managed directly inside your **Cloudflare Dashboard** and deployed freely on **Vercel / GitHub Pages**.
 
