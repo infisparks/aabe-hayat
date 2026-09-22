@@ -299,7 +299,7 @@
                         <div class="text-[10.5px] text-emerald-800 font-bold mt-1" id="stat-delivered-count-text">0 Orders Delivered</div>
                     </div>
 
-                    <!-- 4. Online Paid (Razorpay) -->
+                    <!-- 4. Online Paid (Cashfree) -->
                     <div class="bg-white p-4 rounded-xl border border-[#E5E7EB] shadow-xs">
                         <div class="flex items-center justify-between text-xs font-medium text-[#6B7280] mb-1">
                             <span>Paid Online</span>
@@ -363,7 +363,7 @@
 
                             <select id="filter-provider" onchange="loadOrdersAndStats()" class="px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-white text-[#111827] focus:outline-none focus:border-indigo-600">
                                 <option value="all">All Payment Methods</option>
-                                <option value="razorpay">Online Payment (Razorpay)</option>
+                                <option value="cashfree">Online Payment (Cashfree)</option>
                                 <option value="cod">Cash on Delivery (COD)</option>
                             </select>
 
@@ -1203,7 +1203,7 @@
                 const status = (order.status || 'PENDING').toUpperCase();
                 const isDelivered = status === 'DELIVERED';
                 const isCodOtpPending = isCod && (status === 'OTP_NOT_VERIFIED' || paymentStatus === 'OTP_NOT_VERIFIED' || shippingStatus === 'OTP_NOT_VERIFIED');
-                const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || status === 'PAYMENT_CAPTURED' || status === 'SHIPMENT_BOOKED' || status === 'SHIPPED' || status === 'DELIVERED' || status === 'IN_TRANSIT' || status === 'OUT_FOR_DELIVERY' || Boolean(order.payment && (order.payment.razorpayPaymentId || order.payment.status === 'CAPTURED')));
+                const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || paymentStatus === 'PAID_ONLINE' || status === 'CONFIRMED' || status === 'PAYMENT_CAPTURED' || status === 'SHIPMENT_BOOKED' || status === 'SHIPPED' || status === 'DELIVERED' || status === 'IN_TRANSIT' || status === 'OUT_FOR_DELIVERY' || Boolean(order.payment && (order.payment.cashfreePaymentId || order.payment.cashfree_payment_id || order.payment.payment_id || order.payment.razorpayPaymentId || order.payment.status === 'CAPTURED' || order.payment.status === 'PAID_ONLINE')));
                 const isOnlinePendingPayment = !isCod && !isOnlinePaid && status !== 'CANCELLED';
 
 
@@ -1387,7 +1387,7 @@
                     'COD Fee (Rs)': pricing.codCharge || 0,
                     'Shipping Fee (Rs)': pricing.shipping || 0,
                     'Total Amount (Rs)': pricing.total || 0,
-                    'Payment Method': order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment (Razorpay)',
+                    'Payment Method': (order.paymentMethod === 'cod' || order.payment?.method === 'COD') ? 'Cash on Delivery' : 'Online Payment (Cashfree)',
                     'Payment Status': payment.status || (order.paymentMethod === 'cod' ? 'COD_PENDING' : 'PENDING'),
                     'Delivery Settlement': order.status === 'DELIVERED' ? 'DELIVERED (Realized)' : (order.status || 'PENDING'),
                     'Courier Partner': shipping.courierName || '',
@@ -1602,7 +1602,7 @@
             const courierName = order.shipping && order.shipping.courierName;
             const shippingStatus = ((order.shipping && order.shipping.status) || (isCod && !awb ? 'OTP_NOT_VERIFIED' : 'NOT_BOOKED')).toUpperCase();
             const status = (order.status || 'PENDING').toUpperCase();
-            const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || status === 'PAYMENT_CAPTURED' || (order.payment && order.payment.razorpayPaymentId));
+            const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || paymentStatus === 'PAID_ONLINE' || status === 'CONFIRMED' || status === 'PAYMENT_CAPTURED' || (order.payment && (order.payment.cashfree_payment_id || order.payment.cashfreePaymentId || order.payment.payment_id || order.payment.razorpayPaymentId)));
             const isOnlinePendingPayment = !isCod && !isOnlinePaid && status !== 'CANCELLED';
 
             // Set badge in header
@@ -1957,7 +1957,7 @@
                 const isCod = prov === 'cod' || prov === 'cash_on_delivery' || (order.pricing?.codCharge || 0) > 0;
                 const paymentStatus = ((order.payment && order.payment.status) || (isCod ? 'COD_PENDING' : 'PENDING')).toUpperCase();
                 const status = (order.status || 'PENDING').toUpperCase();
-                const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || status === 'PAYMENT_CAPTURED' || (order.payment && order.payment.razorpayPaymentId));
+                const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || paymentStatus === 'PAID_ONLINE' || status === 'CONFIRMED' || status === 'PAYMENT_CAPTURED' || (order.payment && (order.payment.cashfree_payment_id || order.payment.cashfreePaymentId || order.payment.payment_id || order.payment.razorpayPaymentId)));
                 const isOnlinePendingPayment = !isCod && !isOnlinePaid && status !== 'CANCELLED';
 
                 if (isOnlinePendingPayment) {
@@ -2327,9 +2327,9 @@
         async function moveOrderToShiprocket(orderId) {
             const order = currentOrdersList.find(o => o.orderId === orderId);
             const customerName = order?.customer?.name || 'Customer';
-            const prov = (order?.payment?.provider || order?.paymentMethod || '').toLowerCase();
-            const isAlreadyPaid = prov === 'razorpay' && order?.payment?.status === 'CAPTURED';
-            const payTypeInfo = isAlreadyPaid ? 'Prepaid (Paid Online)' : 'Cash on Delivery (COD)';
+            const prov = (order?.payment?.provider || order?.paymentMethod || order?.payment?.method || '').toLowerCase();
+            const isAlreadyPaid = (prov === 'cashfree' || prov === 'razorpay' || prov === 'online' || prov === 'prepaid') && (order?.payment?.status === 'CAPTURED' || order?.payment?.status === 'PAID_ONLINE' || order?.status === 'CONFIRMED');
+            const payTypeInfo = isAlreadyPaid ? 'Prepaid (Paid Online - Cashfree)' : 'Cash on Delivery (COD)';
 
             const confirmed = confirm(`Move Order #${orderId} (${customerName}) to Shiprocket?\n\nPayment Mode: ${payTypeInfo}\n\nThis will create courier shipment in Shiprocket and mark the order as confirmed for dispatch.`);
             if (!confirmed) return;

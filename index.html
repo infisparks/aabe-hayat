@@ -26,8 +26,8 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Razorpay Checkout SDK -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Cashfree Checkout SDK v3 -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <!-- Firebase App & Realtime Database Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -345,7 +345,7 @@
             </button>
 
             <!-- Prepaid Option in single row -->
-            <button type="button" onclick="setPaymentMethod('RAZORPAY')" id="pagePrepaidOptionBtn" class="payment-method-btn border border-zinc-800 bg-zinc-900/60 p-2.5 rounded-xl text-left transition-all flex flex-col justify-between relative cursor-pointer hover:border-zinc-700">
+            <button type="button" onclick="setPaymentMethod('CASHFREE')" id="pagePrepaidOptionBtn" class="payment-method-btn border border-zinc-800 bg-zinc-900/60 p-2.5 rounded-xl text-left transition-all flex flex-col justify-between relative cursor-pointer hover:border-zinc-700">
               <div class="flex items-center justify-between w-full mb-1">
                 <span class="text-[11px] font-black text-white flex items-center gap-1">
                   <i class="fa-solid fa-bolt text-sky-400 text-xs"></i> Prepaid / UPI
@@ -372,7 +372,7 @@
               <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
               <span>Order COD (₹1,500)</span>
             </button>
-            <button onclick="openFastOrderModalWith('RAZORPAY')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-emerald-400/60 text-emerald-400 font-bold py-2.5 px-2 rounded-xl text-[11px] sm:text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors shadow cursor-pointer">
+            <button onclick="openFastOrderModalWith('CASHFREE')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-emerald-400/60 text-emerald-400 font-bold py-2.5 px-2 rounded-xl text-[11px] sm:text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors shadow cursor-pointer">
               <i class="fa-solid fa-bolt text-xs"></i>
               <span>Pay Online (₹1,400)</span>
             </button>
@@ -670,9 +670,9 @@
                 </div>
               </label>
 
-              <!-- Option 2: Razorpay Online Payment -->
-              <label onclick="setPaymentMethod('RAZORPAY')" class="payment-option-card cursor-pointer border border-zinc-800 bg-zinc-900/60 p-2.5 rounded-xl flex flex-col justify-between transition-all hover:border-zinc-700">
-                <input type="radio" name="payment_method" value="RAZORPAY" class="sr-only" />
+              <!-- Option 2: Cashfree Online Payment -->
+              <label onclick="setPaymentMethod('CASHFREE')" class="payment-option-card cursor-pointer border border-zinc-800 bg-zinc-900/60 p-2.5 rounded-xl flex flex-col justify-between transition-all hover:border-zinc-700">
+                <input type="radio" name="payment_method" value="CASHFREE" class="sr-only" />
                 <div class="flex items-center justify-between w-full">
                   <div class="flex items-center space-x-1.5">
                     <i class="fa-solid fa-credit-card text-sky-400 text-xs sm:text-sm"></i>
@@ -764,7 +764,7 @@
         </button>
 
         <!-- Prepaid / Online Fixed Button -->
-        <button type="button" onclick="openFastOrderModalWith('RAZORPAY')" class="w-full cta-gold-btn shimmer rounded-xl py-2 px-2 text-center transition-all flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95">
+        <button type="button" onclick="openFastOrderModalWith('CASHFREE')" class="w-full cta-gold-btn shimmer rounded-xl py-2 px-2 text-center transition-all flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95">
           <div class="flex items-center space-x-1 text-[11px] font-black text-slate-950 uppercase tracking-tight">
             <i class="fa-solid fa-bolt text-xs"></i>
             <span>Pay Online</span>
@@ -808,7 +808,7 @@
     const COD_UNIT_PRICE = 1500;
     const PREPAID_UNIT_PRICE = 1400;
     const ORIGINAL_UNIT_PRICE = 3000;
-    let selectedPaymentMethod = "COD"; // "COD" or "RAZORPAY"
+    let selectedPaymentMethod = "COD"; // "COD" or "CASHFREE"
     let currentQty = 1;
     let currentSlide = 0;
     const totalSlides = 2;
@@ -886,7 +886,7 @@
       });
     }
 
-    // Payment Method Toggle (COD vs Razorpay Prepaid)
+    // Payment Method Toggle (COD vs Cashfree Prepaid)
     function setPaymentMethod(method) {
       selectedPaymentMethod = method;
 
@@ -959,7 +959,7 @@
     }
 
     function updateCalculatedPrices() {
-      const activeUnitPrice = (selectedPaymentMethod === "RAZORPAY") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
+      const activeUnitPrice = (selectedPaymentMethod === "CASHFREE") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
       const total = activeUnitPrice * currentQty;
       const codTotal = COD_UNIT_PRICE * currentQty;
       const prepaidTotal = PREPAID_UNIT_PRICE * currentQty;
@@ -976,7 +976,7 @@
       
       const displayDiscountEl = document.getElementById("displayDiscountBadge");
       if (displayDiscountEl) {
-        if (selectedPaymentMethod === "RAZORPAY") {
+        if (selectedPaymentMethod === "CASHFREE") {
           displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID SPECIAL - ${discountPercent}% OFF)`;
         } else {
           displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (${discountPercent}% OFF)`;
@@ -1000,7 +1000,7 @@
       // Main CTA button on page
       const mainCtaText = document.getElementById("mainCtaText");
       if (mainCtaText) {
-        if (selectedPaymentMethod === "RAZORPAY") {
+        if (selectedPaymentMethod === "CASHFREE") {
           mainCtaText.innerText = `PAY ONLINE NOW - PREPAID (₹${total.toLocaleString('en-IN')})`;
         } else {
           mainCtaText.innerText = `ORDER NOW - CASH ON DELIVERY (₹${total.toLocaleString('en-IN')})`;
@@ -1021,7 +1021,7 @@
       if (modalQtySummary) modalQtySummary.innerText = `(Qty: ${currentQty})`;
       
       const modalPackSummary = document.getElementById("modalPackSummary");
-      if (modalPackSummary) modalPackSummary.innerText = `${currentQty} Bottle${currentQty > 1 ? 's' : ''} (${currentQty * 500}ml Net Volume) • ${selectedPaymentMethod === 'RAZORPAY' ? 'Prepaid Online' : 'Cash on Delivery'}`;
+      if (modalPackSummary) modalPackSummary.innerText = `${currentQty} Bottle${currentQty > 1 ? 's' : ''} (${currentQty * 500}ml Net Volume) • ${selectedPaymentMethod === 'CASHFREE' ? 'Prepaid Online' : 'Cash on Delivery'}`;
 
       // Modal Submit Button
       const submitBtnText = document.getElementById("modalSubmitBtnText");
@@ -1029,7 +1029,7 @@
         if (selectedPaymentMethod === "COD") {
           submitBtnText.innerText = `CONFIRM CASH ON DELIVERY ORDER (₹${total.toLocaleString('en-IN')})`;
         } else {
-          submitBtnText.innerText = `PAY NOW VIA RAZORPAY / UPI (₹${total.toLocaleString('en-IN')})`;
+          submitBtnText.innerText = `PAY NOW VIA CASHFREE / UPI (₹${total.toLocaleString('en-IN')})`;
         }
       }
     }
@@ -1155,7 +1155,7 @@
         return;
       }
 
-      const activeUnitPrice = (selectedPaymentMethod === "RAZORPAY") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
+      const activeUnitPrice = (selectedPaymentMethod === "CASHFREE") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
       const total = activeUnitPrice * currentQty;
       const orderId = "EH-" + Date.now().toString().slice(-6);
 
@@ -1195,34 +1195,56 @@
       };
 
       // Save order to Database / Worker
-      await saveOrderToDatabase(deliveryApiPayload);
+      const saveResult = await saveOrderToDatabase(deliveryApiPayload);
 
       submitBtn.disabled = false;
       submitBtn.classList.remove("opacity-75");
 
-      if (selectedPaymentMethod === "RAZORPAY") {
-        if (typeof Razorpay !== "undefined") {
-          const options = {
-            key: "rzp_live_TNiYDSuj88YOFb",
-            amount: total * 100, // in paise
-            currency: "INR",
-            name: "EMPIRE Global Herbal Science",
-            description: `Order #${orderId} - Aab-E-Hayat Botanical Drink (${currentQty} Bottle${currentQty > 1 ? 's' : ''})`,
-            image: "./image/1.png",
-            handler: async function (response) {
-              const paymentId = response.razorpay_payment_id || "PAY_" + Date.now();
+      if (selectedPaymentMethod === "CASHFREE") {
+        const paymentSessionId = saveResult?.payment_session_id || saveResult?.cashfree?.payment_session_id;
+
+        if (typeof Cashfree !== "undefined" && paymentSessionId) {
+          try {
+            const cashfree = Cashfree({ mode: "production" });
+            const checkoutOptions = {
+              paymentSessionId: paymentSessionId,
+              redirectTarget: "_modal"
+            };
+
+            cashfree.checkout(checkoutOptions).then(async function (result) {
+              const paymentId = result.paymentDetails?.payment_id || `CF_${Date.now()}`;
               deliveryApiPayload.payment.status = "PAID_ONLINE";
-              deliveryApiPayload.payment.razorpay_payment_id = paymentId;
+              deliveryApiPayload.payment.cashfree_payment_id = paymentId;
+              deliveryApiPayload.payment.method = "CASHFREE";
               deliveryApiPayload.status = "CONFIRMED";
-              
+
+              // Verify on Cloudflare Worker backend
+              const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
+              if (workerUrl) {
+                try {
+                  await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      order_id: orderId,
+                      cf_order_id: saveResult?.cashfree?.cf_order_id,
+                      payment_id: paymentId,
+                      verified: !result.error
+                    })
+                  });
+                } catch (vErr) {
+                  console.warn("Backend payment verification error:", vErr);
+                }
+              }
+
               await saveOrderToDatabase(deliveryApiPayload);
 
               const msg = encodeURIComponent(
-                `*✅ CONFIRMED ONLINE ORDER - RAZORPAY*\n` +
+                `*✅ CONFIRMED ONLINE ORDER - CASHFREE*\n` +
                 `----------------------------------------\n` +
                 `📦 *Order ID:* ${orderId}\n` +
                 `💳 *Payment ID:* ${paymentId}\n` +
-                `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid Discount Applied)\n` +
+                `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid ₹100 Discount Applied)\n` +
                 `🌿 *Product:* AAB-E-HAYAT Natural Botanical Drink (500ml)\n` +
                 `🔢 *Quantity:* ${currentQty} Bottle(s)\n\n` +
                 `📍 *SHIPPING & DELIVERY ADDRESS:*\n` +
@@ -1237,29 +1259,28 @@
               );
               showOrderSuccess(deliveryApiPayload, msg);
               window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
-            },
-            prefill: {
-              name: name,
-              contact: phone
-            },
-            theme: {
-              color: "#f5a623"
-            }
-          };
-          const rzp = new Razorpay(options);
-          rzp.on('payment.failed', function (response) {
-            alert("Payment cancelled or failed: " + (response.error ? response.error.description : 'Please try again'));
-          });
-          rzp.open();
+            }).catch(function (cfErr) {
+              console.warn("Cashfree checkout popup error/closed:", cfErr);
+            });
+          } catch (sdkErr) {
+            console.error("Cashfree checkout error:", sdkErr);
+            alert("Could not load Cashfree checkout modal. Redirecting to WhatsApp to complete order.");
+            const fallbackMsg = encodeURIComponent(
+              `*💳 PREPAID ONLINE ORDER - CASHFREE*\n` +
+              `Order ID: ${orderId}\nAmount: ₹${total}\nQuantity: ${currentQty}\nName: ${name}\nPhone: ${phone}`
+            );
+            showOrderSuccess(deliveryApiPayload, fallbackMsg);
+            window.open(`https://wa.me/918329494445?text=${fallbackMsg}`, '_blank');
+          }
         } else {
-          // Direct WhatsApp prepaid confirmation
+          // Direct WhatsApp prepaid confirmation fallback
           const msg = encodeURIComponent(
             `*💳 PREPAID ONLINE ORDER - AAB-E-HAYAT*\n` +
             `----------------------------------------\n` +
             `📦 *Order ID:* ${orderId}\n` +
             `💰 *Amount:* ₹${total.toLocaleString('en-IN')} (Prepaid Online Special)\n` +
             `🔢 *Quantity:* ${currentQty} Bottle(s) (500ml)\n` +
-            `💳 *Payment Choice:* UPI / Online\n\n` +
+            `💳 *Payment Choice:* Cashfree UPI / Online\n\n` +
             `📍 *DELIVERY ADDRESS:*\n` +
             `👤 *Name:* ${name}\n` +
             `📞 *Phone:* +91 ${phone}\n` +
@@ -1297,6 +1318,31 @@
         window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
       }
     }
+
+    // Auto-verify if returning from Cashfree redirect payment
+    window.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnedOrderId = urlParams.get("cf_order_id") || urlParams.get("order_id");
+      if (returnedOrderId) {
+        const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
+        if (workerUrl) {
+          try {
+            const vRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ order_id: returnedOrderId, verified: true })
+            });
+            const vData = await vRes.json();
+            if (vData.success && vData.order) {
+              openFastOrderModal();
+              showOrderSuccess(vData.order, encodeURIComponent(`*✅ CONFIRMED ONLINE ORDER - CASHFREE*\nOrder ID: ${returnedOrderId}`));
+            }
+          } catch (e) {
+            console.warn("Return URL verification:", e);
+          }
+        }
+      }
+    });
 
     // Live Social Proof Toast Simulation
     const buyers = [

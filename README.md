@@ -25,5 +25,4 @@ aabe-hayyat/
 
 1. **Frontend (GitHub Pages / Vercel)**: Push to GitHub and deploy statically for free.
 2. **Backend (Cloudflare Worker)**: Copy `worker.js` and paste it into a Cloudflare Worker at [dash.cloudflare.com](https://dash.cloudflare.com/).
-3. **Environment Variables**: Add your live `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `SHIPROCKET_EMAIL`, `SHIPROCKET_PASSWORD` in Cloudflare Worker **Settings → Variables and Secrets**.
-# aabe-hayat
+3. **Environment Variables**: Add your live `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `SHIPROCKET_EMAIL`, `SHIPROCKET_PASSWORD` in Cloudflare Worker **Settings → Variables and Secrets**.
