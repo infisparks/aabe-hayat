@@ -1,20 +1,26 @@
 {
   "rules": {
-    ".read": false,
-    ".write": false,
+    ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+    ".write": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
     "orders": {
+      ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+      ".indexOn": ["status", "order_date", "created_at"],
       "$orderId": {
-        ".read": false,
-        ".write": false
+        ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+        ".write": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com') || (!data.exists() && newData.exists())"
       }
     },
+    "settings": {
+      ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+      ".write": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')"
+    },
     "webhookEvents": {
-      ".read": false,
-      ".write": false
+      ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+      ".write": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')"
     },
     "idempotencyLocks": {
-      ".read": false,
-      ".write": false
+      ".read": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')",
+      ".write": "auth != null && (auth.uid === '0kRP8ItGUlc8E4tttNCcbwxeelf1' || auth.token.email === 'aabe@gmail.com')"
     }
   }
 }

@@ -750,6 +750,24 @@
         const auth = firebase.auth();
         const WORKER_BASE = window.WORKER_API_URL || "https://aabe-hayat.infisparks.workers.dev";
 
+        // Evolution API Configuration for Admin WhatsApp Concierge
+        const EVO_CONFIG = {
+            baseUrl: "https://evo.infispark.in",
+            instance: "mudassir",
+            apiKey: "vR39h6avY69g7kAU3YQbS6V6XEvudson"
+        };
+
+        // Robust COD Payment Method Detection Helper
+        function getOrderIsCod(order) {
+            if (!order) return false;
+            const prov = String(order.payment?.provider || order.payment?.method || order.paymentMethod || order.payment_method || '').toLowerCase();
+            const hasCodCharge = (order.pricing?.codCharge || 0) > 0;
+            const hasCodEvent = (order.events || []).some(e => String(e.event || '').toLowerCase().includes('cod'));
+            const status = String(order.status || '').toLowerCase();
+            const paymentStatus = String(order.payment?.status || '').toLowerCase();
+            return prov === 'cod' || prov === 'cash_on_delivery' || prov.includes('cod') || status.includes('cod') || paymentStatus.includes('cod') || hasCodCharge || hasCodEvent;
+        }
+
         let currentAdminToken = null;
         let currentOrdersList = [];
         let pendingCancelOrderId = null;
@@ -1042,7 +1060,7 @@
                 for (const o of currentOrdersList) {
                     const amt = Number(o.pricing?.total || o.product?.total_amount || 0);
                     const st = (o.status || '').toUpperCase();
-                    const isCod = (o.payment?.method || 'COD').toUpperCase() === 'COD';
+                    const isCod = getOrderIsCod(o);
 
                     if (st !== 'CANCELLED') {
                         totalRev += amt;
@@ -1190,11 +1208,9 @@
                 const itemsNames = (order.items || []).map(i => `${i.name || i.variantName} (x${i.quantity || 1})`).join(', ');
                 const total = order.pricing ? `Rs. ${parseFloat(order.pricing.total).toFixed(2)}` : 'Rs. 0.00';
                 
-                // Robust Payment Method & COD Detection (Case-insensitive & field fallback)
-                const prov = (order.payment?.provider || order.paymentMethod || order.payment_method || '').toLowerCase();
-                const hasCodCharge = (order.pricing?.codCharge || 0) > 0;
-                const hasCodEvent = (order.events || []).some(e => (e.event || '').includes('COD'));
-                const isCod = prov === 'cod' || prov === 'cash_on_delivery' || hasCodCharge || hasCodEvent;
+                // Robust Payment Method & COD Detection (Unified Helper)
+                const isCod = getOrderIsCod(order);
+                const prov = (order.payment?.provider || order.payment?.method || (isCod ? 'cod' : 'online')).toLowerCase();
 
                 const paymentStatus = ((order.payment && order.payment.status) || (isCod ? 'COD_PENDING' : 'PENDING')).toUpperCase();
                 const shippingStatus = ((order.shipping && order.shipping.status) || 'NOT_BOOKED').toUpperCase();
@@ -1592,10 +1608,8 @@
             
             const isCancelled = order.status === 'CANCELLED';
             const isDelivered = order.status === 'DELIVERED';
-            const prov = (order.payment?.provider || order.paymentMethod || order.payment_method || '').toLowerCase();
-            const hasCodCharge = (order.pricing?.codCharge || 0) > 0;
-            const hasCodEvent = (order.events || []).some(e => (e.event || '').includes('COD'));
-            const isCod = prov === 'cod' || prov === 'cash_on_delivery' || hasCodCharge || hasCodEvent;
+            const isCod = getOrderIsCod(order);
+            const prov = (order.payment?.provider || order.payment?.method || (isCod ? 'cod' : 'online')).toLowerCase();
 
             const paymentStatus = ((order.payment && order.payment.status) || (isCod ? (isDelivered ? 'CAPTURED' : 'COD_PENDING') : 'PENDING')).toUpperCase();
             const awb = order.shipping && order.shipping.awb;
@@ -1830,8 +1844,7 @@
             const customerName = (order.customer && order.customer.name) || 'Customer';
             const orderId = order.orderId || 'Order';
             const totalAmount = order.pricing && order.pricing.total ? `Rs. ${order.pricing.total}` : 'Rs. 0';
-            const prov = (order.payment?.provider || order.paymentMethod || order.payment_method || '').toLowerCase();
-            const isCod = prov === 'cod' || prov === 'cash_on_delivery' || (order.pricing?.codCharge || 0) > 0;
+            const isCod = getOrderIsCod(order);
             const paymentMethodText = isCod ? 'Cash on Delivery' : 'Paid Online';
             const itemsText = formatOrderItemsForWhatsApp(order);
             const estDeliveryDate = calculateEstimatedDeliveryRange(order.createdAt);
@@ -1953,8 +1966,7 @@
 
             // Auto-detect default template if not explicitly specified
             if (!defaultTemplate) {
-                const prov = (order.payment?.provider || order.paymentMethod || order.payment_method || '').toLowerCase();
-                const isCod = prov === 'cod' || prov === 'cash_on_delivery' || (order.pricing?.codCharge || 0) > 0;
+                const isCod = getOrderIsCod(order);
                 const paymentStatus = ((order.payment && order.payment.status) || (isCod ? 'COD_PENDING' : 'PENDING')).toUpperCase();
                 const status = (order.status || 'PENDING').toUpperCase();
                 const isOnlinePaid = !isCod && (paymentStatus === 'CAPTURED' || paymentStatus === 'PAID_ONLINE' || status === 'CONFIRMED' || status === 'PAYMENT_CAPTURED' || (order.payment && (order.payment.cashfree_payment_id || order.payment.cashfreePaymentId || order.payment.payment_id || order.payment.razorpayPaymentId)));
@@ -2070,6 +2082,36 @@
             }
 
             try {
+                // 1. Direct Evolution WhatsApp API call
+                const evoUrl = `${EVO_CONFIG.baseUrl.replace(/\/$/, '')}/message/sendText/${encodeURIComponent(EVO_CONFIG.instance)}`;
+                const formattedPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+
+                const evoRes = await fetch(evoUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': EVO_CONFIG.apiKey
+                    },
+                    body: JSON.stringify({
+                        number: formattedPhone,
+                        text: message
+                    })
+                });
+
+                if (evoRes.ok) {
+                    if (btn) {
+                        btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>Message Sent via Evolution!</span>`;
+                        btn.className = 'px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md cursor-default';
+                    }
+                    setTimeout(() => {
+                        closeWhatsAppModal();
+                        alert(`✅ WhatsApp message sent successfully via Evolution API to ${order.customer?.name || 'Customer'} (+${formattedPhone})!`);
+                        loadOrdersAndStats();
+                    }, 600);
+                    return;
+                }
+
+                // Fallback to backend route if direct API returned non-200
                 const response = await fetch(`/api/admin/orders/${encodeURIComponent(currentWhatsAppOrderId)}/whatsapp`, {
                     method: 'POST',
                     headers: {
@@ -2082,7 +2124,7 @@
                     })
                 });
 
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
                 if (response.ok && result.success) {
                     if (btn) {
                         btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>Message Sent!</span>`;
@@ -2090,11 +2132,11 @@
                     }
                     setTimeout(() => {
                         closeWhatsAppModal();
-                        alert(`✅ WhatsApp message sent successfully via API to ${order.customer?.name || 'Customer'} (+91 ${cleanPhone})!`);
+                        alert(`✅ WhatsApp message sent successfully to ${order.customer?.name || 'Customer'} (+91 ${cleanPhone})!`);
                         loadOrdersAndStats();
                     }, 600);
                 } else {
-                    throw new Error(result.error || result.message || 'Server returned failure.');
+                    throw new Error(result.error || result.message || 'Evolution API send returned failure.');
                 }
             } catch (err) {
                 console.error("WhatsApp API Send Error:", err);
@@ -2484,7 +2526,8 @@
                 if (response.ok && result.success) {
                     closeDeleteModal();
                     loadOrdersAndStats();
-                    alert(`Order #${orderId} has been permanently deleted.`);
+                    const srText = result.shiprocket_cancelled ? " and cancelled in Shiprocket" : "";
+                    alert(`✅ Order #${orderId} has been permanently deleted from Firebase${srText}.`);
                 } else {
                     alert(result.error?.message || "Failed to delete order.");
                     if (btn) {

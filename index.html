@@ -712,6 +712,49 @@
           </p>
         </form>
 
+        <!-- COD WhatsApp OTP Verification View -->
+        <div id="codOtpVerificationView" class="hidden space-y-3.5 py-1 text-left animate-toast-in">
+          <div class="text-center space-y-1">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-400 flex items-center justify-center text-xl mx-auto shadow-md">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <h4 class="text-sm sm:text-base font-black text-white">Verify WhatsApp Mobile</h4>
+            <p class="text-[11px] text-slate-300">
+              We sent a 4-digit verification code to <span id="otpRecipientPhone" class="font-bold text-amber-400 font-mono">+91 XXXXXXXXXX</span> on WhatsApp.
+            </p>
+          </div>
+
+          <!-- OTP Input Box -->
+          <div class="space-y-2 bg-zinc-900/90 border border-zinc-800 p-3.5 rounded-2xl">
+            <label class="block text-center text-xs font-bold text-slate-300">Enter 4-Digit Verification Code</label>
+            <div class="flex justify-center">
+              <input type="text" id="codOtpInput" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="••••" class="w-44 text-center tracking-[10px] text-2xl font-mono font-black py-2.5 bg-zinc-950 border-2 border-amber-400 rounded-xl text-amber-400 outline-none focus:ring-2 focus:ring-amber-400/40" />
+            </div>
+            <div id="otpErrorMsg" class="hidden text-center text-[11px] text-red-400 font-bold">
+              <i class="fa-solid fa-circle-exclamation"></i> <span>Incorrect OTP. Please check the code sent on WhatsApp.</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="space-y-2">
+            <button type="button" onclick="verifyCodOtpAndPlaceOrder()" id="verifyOtpBtn" class="w-full cta-gold-btn shimmer rounded-2xl p-3.5 text-center cursor-pointer shadow-xl">
+              <div class="text-xs sm:text-sm font-black text-slate-950 flex items-center justify-center space-x-2 uppercase tracking-wide">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="verifyOtpBtnText">VERIFY & CONFIRM COD ORDER</span>
+              </div>
+            </button>
+
+            <div class="flex items-center justify-between text-xs px-1">
+              <button type="button" onclick="resendCodOtp()" id="resendOtpBtn" class="text-slate-400 hover:text-amber-400 transition-colors text-[11px] cursor-pointer">
+                <i class="fa-solid fa-rotate-right text-[10px]"></i> <span id="resendOtpText">Resend OTP</span>
+              </button>
+              <button type="button" onclick="backToEditOrderForm()" class="text-slate-400 hover:text-white transition-colors text-[11px] cursor-pointer">
+                <i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit Details
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Order Placed & Live Confirmation View -->
         <div id="orderSuccessView" class="hidden space-y-3 py-2 text-left animate-toast-in">
           <div class="text-center space-y-1.5">
@@ -1194,16 +1237,187 @@
       return { success: true, order_id: orderPayload.order_id };
     }
 
+    // --- Evolution API WhatsApp Messaging System ---
+    const EVO_CONFIG = {
+      baseUrl: "https://evo.infispark.in",
+      instance: "mudassir",
+      apiKey: "vR39h6avY69g7kAU3YQbS6V6XEvudson"
+    };
+
+    function formatWhatsappPhone(phone) {
+      if (!phone) return "";
+      let clean = phone.toString().replace(/\D/g, "");
+      if (clean.length === 10) {
+        clean = "91" + clean;
+      } else if (clean.length === 11 && clean.startsWith("0")) {
+        clean = "91" + clean.slice(1);
+      }
+      return clean;
+    }
+
+    async function sendEvoWhatsAppMessage(recipientPhone, messageText) {
+      try {
+        const formattedNumber = formatWhatsappPhone(recipientPhone);
+        if (!formattedNumber) return false;
+        const endpoint = `${EVO_CONFIG.baseUrl.replace(/\/$/, '')}/message/sendText/${encodeURIComponent(EVO_CONFIG.instance)}`;
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": EVO_CONFIG.apiKey
+          },
+          body: JSON.stringify({
+            number: formattedNumber,
+            text: messageText
+          })
+        });
+        const data = await res.json().catch(() => null);
+        console.log("Evolution API WhatsApp result:", formattedNumber, data);
+        return res.ok;
+      } catch (err) {
+        console.warn("Evolution API send error:", err);
+        return false;
+      }
+    }
+
+    // COD OTP Verification State
+    let pendingCodOrder = null;
+    let otpCountdownInterval = null;
+
+    function startOtpCountdown(seconds = 30) {
+      clearInterval(otpCountdownInterval);
+      const resendBtn = document.getElementById("resendOtpBtn");
+      const resendText = document.getElementById("resendOtpText");
+      if (!resendBtn || !resendText) return;
+
+      let remaining = seconds;
+      resendBtn.disabled = true;
+      resendBtn.classList.add("opacity-50", "cursor-not-allowed");
+      resendText.innerText = `Resend in ${remaining}s`;
+
+      otpCountdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(otpCountdownInterval);
+          resendBtn.disabled = false;
+          resendBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          resendText.innerText = "Resend OTP";
+        } else {
+          resendText.innerText = `Resend in ${remaining}s`;
+        }
+      }, 1000);
+    }
+
+    async function resendCodOtp() {
+      if (!pendingCodOrder) return;
+      const resendBtn = document.getElementById("resendOtpBtn");
+      if (resendBtn && resendBtn.disabled) return;
+
+      const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      pendingCodOrder.otp = newOtp;
+      document.getElementById("otpErrorMsg").classList.add("hidden");
+      document.getElementById("codOtpInput").value = "";
+
+      const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Drink*\n\nYour new Cash on Delivery (COD) verification code is: *${newOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your mobile number and confirm your order.\n📦 Amount to pay at delivery: ₹${pendingCodOrder.total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
+      
+      startOtpCountdown(30);
+      await sendEvoWhatsAppMessage(pendingCodOrder.phone, otpMsg);
+    }
+
+    function backToEditOrderForm() {
+      clearInterval(otpCountdownInterval);
+      document.getElementById("codOtpVerificationView").classList.add("hidden");
+      document.getElementById("fastOrderForm").classList.remove("hidden");
+    }
+
+    async function verifyCodOtpAndPlaceOrder() {
+      if (!pendingCodOrder) return;
+      const inputEl = document.getElementById("codOtpInput");
+      const enteredOtp = (inputEl ? inputEl.value : "").trim();
+      const errorEl = document.getElementById("otpErrorMsg");
+
+      if (!enteredOtp || enteredOtp.length !== 4) {
+        if (errorEl) {
+          errorEl.innerText = "Please enter the 4-digit code sent on WhatsApp.";
+          errorEl.classList.remove("hidden");
+        }
+        if (inputEl) inputEl.focus();
+        return;
+      }
+
+      if (enteredOtp !== pendingCodOrder.otp) {
+        if (errorEl) {
+          errorEl.innerText = "Incorrect OTP. Please enter the valid 4-digit code.";
+          errorEl.classList.remove("hidden");
+        }
+        if (inputEl) {
+          inputEl.value = "";
+          inputEl.focus();
+        }
+        return;
+      }
+
+      // OTP is valid! Proceed with COD booking
+      if (errorEl) errorEl.classList.add("hidden");
+      const verifyBtn = document.getElementById("verifyOtpBtn");
+      if (verifyBtn) {
+        verifyBtn.disabled = true;
+        document.getElementById("verifyOtpBtnText").innerText = "CONFIRMING ORDER...";
+      }
+
+      const orderPayload = pendingCodOrder.payload;
+      orderPayload.status = "CONFIRMED";
+      orderPayload.payment.otp_verified = true;
+      orderPayload.payment.status = "PENDING_COD";
+
+      // 1. Save order to Database / Cloudflare Worker
+      await saveOrderToDatabase(orderPayload);
+
+      // 2. Send Automated WhatsApp Confirmation via Evolution API
+      const evoConfirmMsg = `🌿 *AAB-E-HAYAT™ - COD ORDER CONFIRMED*\n` +
+        `----------------------------------------\n` +
+        `📦 *Order ID:* ${orderPayload.order_id}\n` +
+        `👤 *Customer Name:* ${pendingCodOrder.name}\n` +
+        `📞 *WhatsApp Mobile:* +91 ${pendingCodOrder.phone}\n` +
+        `🌿 *Product:* AAB-E-HAYAT™ Natural Botanical Drink (500ml)\n` +
+        `🔢 *Quantity:* ${pendingCodOrder.quantity} Bottle(s)\n` +
+        `💰 *Amount to Collect at Delivery:* ₹${pendingCodOrder.total.toLocaleString('en-IN')} (COD)\n` +
+        `💵 *Payment Method:* Cash on Delivery (COD - OTP Verified ✅)\n\n` +
+        `📍 *DELIVERY ADDRESS:*\n` +
+        `🏠 ${pendingCodOrder.houseNo}\n` +
+        `🛣️ ${pendingCodOrder.area}\n` +
+        `🏙️ ${pendingCodOrder.city}, ${pendingCodOrder.state} - ${pendingCodOrder.pincode}\n` +
+        `----------------------------------------\n` +
+        `🚚 Your COD order is confirmed! Our dispatch team is packaging your bottle(s) for express delivery.\n` +
+        `📞 WhatsApp Concierge: +91 83294 94445`;
+
+      await sendEvoWhatsAppMessage(pendingCodOrder.phone, evoConfirmMsg);
+
+      // 3. Fallback WhatsApp Link Message
+      const waMsg = encodeURIComponent(evoConfirmMsg);
+
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        document.getElementById("verifyOtpBtnText").innerText = "VERIFY & CONFIRM COD ORDER";
+      }
+
+      clearInterval(otpCountdownInterval);
+      document.getElementById("codOtpVerificationView").classList.add("hidden");
+      showOrderSuccess(orderPayload, waMsg);
+    }
+
     let latestWhatsAppMsg = "";
 
     function showOrderSuccess(payload, waMsg) {
       latestWhatsAppMsg = waMsg;
       document.getElementById("fastOrderForm").classList.add("hidden");
+      document.getElementById("codOtpVerificationView").classList.add("hidden");
       document.getElementById("modalItemRecap").classList.add("hidden");
       
       document.getElementById("successOrderId").innerText = payload.order_id;
       document.getElementById("successItemSummary").innerText = `AAB-E-HAYAT Juice (500ml) x ${payload.product.quantity} Bottle(s)`;
-      document.getElementById("successPaymentSummary").innerText = `₹${payload.product.total_amount.toLocaleString('en-IN')} (${payload.payment.method === 'COD' ? 'Cash on Delivery' : 'Paid Online'})`;
+      const isCodMethod = (payload.payment?.method === 'COD' || payload.payment?.provider === 'COD');
+      document.getElementById("successPaymentSummary").innerText = `₹${payload.product.total_amount.toLocaleString('en-IN')} (${isCodMethod ? 'Cash on Delivery' : 'Paid Online'})`;
       
       const addr = payload.shipping_address;
       document.getElementById("successAddressSummary").innerText = `${addr.recipient_name} | ${addr.phone}\n${addr.house_building_no}, ${addr.area_landmark}\n${addr.city}, ${addr.state} - ${addr.pincode}`;
@@ -1218,9 +1432,11 @@
     }
 
     function resetAndPlaceNewOrder() {
+      clearInterval(otpCountdownInterval);
       document.getElementById("fastOrderForm").reset();
       loadSavedAddress();
       document.getElementById("fastOrderForm").classList.remove("hidden");
+      document.getElementById("codOtpVerificationView").classList.add("hidden");
       document.getElementById("modalItemRecap").classList.remove("hidden");
       document.getElementById("orderSuccessView").classList.add("hidden");
       currentQty = 1;
@@ -1288,6 +1504,7 @@
         },
         payment: {
           method: selectedPaymentMethod,
+          provider: selectedPaymentMethod,
           status: selectedPaymentMethod === "COD" ? "PENDING_COD" : "PREPAID_ONLINE",
           currency: "INR",
           amount: total
@@ -1295,126 +1512,142 @@
         status: selectedPaymentMethod === "COD" ? "PENDING_COD" : "PENDING_PAYMENT"
       };
 
-      // Save order to Database / Worker
+      if (selectedPaymentMethod === "COD") {
+        // Cash on Delivery: Trigger WhatsApp OTP Verification Flow
+        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        pendingCodOrder = {
+          payload: deliveryApiPayload,
+          otp: generatedOtp,
+          name,
+          phone,
+          houseNo,
+          area,
+          pincode,
+          city,
+          state,
+          quantity: currentQty,
+          total
+        };
+
+        const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Drink*\n\nYour Cash on Delivery (COD) verification code is: *${generatedOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your WhatsApp number and confirm your order.\n📦 Amount to pay at delivery: ₹${total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
+        
+        await sendEvoWhatsAppMessage(phone, otpMsg);
+
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-75");
+
+        document.getElementById("fastOrderForm").classList.add("hidden");
+        document.getElementById("otpRecipientPhone").innerText = "+91 " + phone;
+        document.getElementById("otpErrorMsg").classList.add("hidden");
+        document.getElementById("codOtpInput").value = "";
+        document.getElementById("codOtpVerificationView").classList.remove("hidden");
+        document.getElementById("codOtpInput").focus();
+        startOtpCountdown(30);
+        return;
+      }
+
+      // Online (Cashfree) Payment Flow
       const saveResult = await saveOrderToDatabase(deliveryApiPayload);
 
       submitBtn.disabled = false;
       submitBtn.classList.remove("opacity-75");
 
-      if (selectedPaymentMethod === "CASHFREE") {
-        const paymentSessionId = saveResult?.payment_session_id || saveResult?.cashfree?.payment_session_id;
+      const paymentSessionId = saveResult?.payment_session_id || saveResult?.cashfree?.payment_session_id;
 
-        if (typeof Cashfree !== "undefined" && paymentSessionId) {
-          try {
-            const cashfree = Cashfree({ mode: "production" });
-            const checkoutOptions = {
-              paymentSessionId: paymentSessionId,
-              redirectTarget: "_modal"
-            };
+      if (typeof Cashfree !== "undefined" && paymentSessionId) {
+        try {
+          const cashfree = Cashfree({ mode: "production" });
+          const checkoutOptions = {
+            paymentSessionId: paymentSessionId,
+            redirectTarget: "_modal"
+          };
 
-            cashfree.checkout(checkoutOptions).then(async function (result) {
-              const paymentId = result.paymentDetails?.payment_id || `CF_${Date.now()}`;
-              deliveryApiPayload.payment.status = "PAID_ONLINE";
-              deliveryApiPayload.payment.cashfree_payment_id = paymentId;
-              deliveryApiPayload.payment.method = "CASHFREE";
-              deliveryApiPayload.status = "CONFIRMED";
+          cashfree.checkout(checkoutOptions).then(async function (result) {
+            const paymentId = result.paymentDetails?.payment_id || `CF_${Date.now()}`;
+            deliveryApiPayload.payment.status = "PAID_ONLINE";
+            deliveryApiPayload.payment.cashfree_payment_id = paymentId;
+            deliveryApiPayload.payment.method = "CASHFREE";
+            deliveryApiPayload.payment.provider = "CASHFREE";
+            deliveryApiPayload.status = "CONFIRMED";
 
-              // Verify on Cloudflare Worker backend
-              const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
-              if (workerUrl) {
-                try {
-                  await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      order_id: orderId,
-                      cf_order_id: saveResult?.cashfree?.cf_order_id,
-                      payment_id: paymentId,
-                      verified: !result.error
-                    })
-                  });
-                } catch (vErr) {
-                  console.warn("Backend payment verification error:", vErr);
-                }
+            // Verify on Cloudflare Worker backend
+            const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
+            if (workerUrl) {
+              try {
+                await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    order_id: orderId,
+                    cf_order_id: saveResult?.cashfree?.cf_order_id,
+                    payment_id: paymentId,
+                    verified: !result.error
+                  })
+                });
+              } catch (vErr) {
+                console.warn("Backend payment verification error:", vErr);
               }
+            }
 
-              await saveOrderToDatabase(deliveryApiPayload);
+            await saveOrderToDatabase(deliveryApiPayload);
 
-              const msg = encodeURIComponent(
-                `*✅ CONFIRMED ONLINE ORDER - CASHFREE*\n` +
-                `----------------------------------------\n` +
-                `📦 *Order ID:* ${orderId}\n` +
-                `💳 *Payment ID:* ${paymentId}\n` +
-                `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid ₹100 Discount Applied)\n` +
-                `🌿 *Product:* AAB-E-HAYAT Natural Botanical Drink (500ml)\n` +
-                `🔢 *Quantity:* ${currentQty} Bottle(s)\n\n` +
-                `📍 *SHIPPING & DELIVERY ADDRESS:*\n` +
-                `👤 *Name:* ${name}\n` +
-                `📞 *Phone:* +91 ${phone}\n` +
-                `🏠 *House/Flat:* ${houseNo}\n` +
-                `🛣️ *Street/Area:* ${area}\n` +
-                `🏙️ *City/State:* ${city}, ${state}\n` +
-                `📮 *Pincode:* ${pincode}\n` +
-                `----------------------------------------\n` +
-                `Please dispatch express tracking details!`
-              );
-              showOrderSuccess(deliveryApiPayload, msg);
-              window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
-            }).catch(function (cfErr) {
-              console.warn("Cashfree checkout popup error/closed:", cfErr);
-            });
-          } catch (sdkErr) {
-            console.error("Cashfree checkout error:", sdkErr);
-            alert("Could not load Cashfree checkout modal. Redirecting to WhatsApp to complete order.");
-            const fallbackMsg = encodeURIComponent(
-              `*💳 PREPAID ONLINE ORDER - CASHFREE*\n` +
-              `Order ID: ${orderId}\nAmount: ₹${total}\nQuantity: ${currentQty}\nName: ${name}\nPhone: ${phone}`
-            );
-            showOrderSuccess(deliveryApiPayload, fallbackMsg);
-            window.open(`https://wa.me/918329494445?text=${fallbackMsg}`, '_blank');
-          }
-        } else {
-          // Direct WhatsApp prepaid confirmation fallback
-          const msg = encodeURIComponent(
-            `*💳 PREPAID ONLINE ORDER - AAB-E-HAYAT*\n` +
-            `----------------------------------------\n` +
-            `📦 *Order ID:* ${orderId}\n` +
-            `💰 *Amount:* ₹${total.toLocaleString('en-IN')} (Prepaid Online Special)\n` +
-            `🔢 *Quantity:* ${currentQty} Bottle(s) (500ml)\n` +
-            `💳 *Payment Choice:* Cashfree UPI / Online\n\n` +
-            `📍 *DELIVERY ADDRESS:*\n` +
-            `👤 *Name:* ${name}\n` +
-            `📞 *Phone:* +91 ${phone}\n` +
-            `🏠 *House/Building:* ${houseNo}\n` +
-            `🛣️ *Area/Landmark:* ${area}\n` +
-            `🏙️ *City, State:* ${city}, ${state}\n` +
-            `📮 *Pincode:* ${pincode}\n` +
-            `----------------------------------------\n` +
-            `Please share your UPI QR code or payment link to complete order!`
+            // Automated WhatsApp confirmation via Evolution API
+            const evoOnlineMsg = `✅ *AAB-E-HAYAT™ - ONLINE PAYMENT CONFIRMED*\n` +
+              `----------------------------------------\n` +
+              `📦 *Order ID:* ${orderId}\n` +
+              `💳 *Payment ID:* ${paymentId}\n` +
+              `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid ₹100 Discount Applied)\n` +
+              `👤 *Customer Name:* ${name}\n` +
+              `📞 *WhatsApp Mobile:* +91 ${phone}\n` +
+              `🌿 *Product:* AAB-E-HAYAT Natural Botanical Drink (500ml)\n` +
+              `🔢 *Quantity:* ${currentQty} Bottle(s)\n\n` +
+              `📍 *SHIPPING & DELIVERY ADDRESS:*\n` +
+              `🏠 ${houseNo}\n` +
+              `🛣️ ${area}\n` +
+              `🏙️ ${city}, ${state} - ${pincode}\n` +
+              `----------------------------------------\n` +
+              `⚡ Priority Express Dispatch Initiated! Thank you for ordering AAB-E-HAYAT.\n` +
+              `📞 WhatsApp Concierge: +91 83294 94445`;
+
+            await sendEvoWhatsAppMessage(phone, evoOnlineMsg);
+
+            const msg = encodeURIComponent(evoOnlineMsg);
+            showOrderSuccess(deliveryApiPayload, msg);
+            window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
+          }).catch(function (cfErr) {
+            console.warn("Cashfree checkout popup error/closed:", cfErr);
+          });
+        } catch (sdkErr) {
+          console.error("Cashfree checkout error:", sdkErr);
+          alert("Could not load Cashfree checkout modal. Redirecting to WhatsApp to complete order.");
+          const fallbackMsg = encodeURIComponent(
+            `*💳 PREPAID ONLINE ORDER - CASHFREE*\n` +
+            `Order ID: ${orderId}\nAmount: ₹${total}\nQuantity: ${currentQty}\nName: ${name}\nPhone: ${phone}`
           );
-          showOrderSuccess(deliveryApiPayload, msg);
-          window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
+          showOrderSuccess(deliveryApiPayload, fallbackMsg);
+          window.open(`https://wa.me/918329494445?text=${fallbackMsg}`, '_blank');
         }
       } else {
-        // Cash on Delivery (COD) Flow
-        const msg = encodeURIComponent(
-          `*📦 NEW CASH ON DELIVERY (COD) ORDER*\n` +
+        // Direct WhatsApp prepaid confirmation fallback
+        const evoPrepaidMsg = `*💳 PREPAID ONLINE ORDER - AAB-E-HAYAT*\n` +
           `----------------------------------------\n` +
-          `🏷️ *Order ID:* ${orderId}\n` +
-          `🌿 *Product:* AAB-E-HAYAT Natural Botanical Drink (500ml)\n` +
-          `🔢 *Quantity:* ${currentQty} Bottle(s)\n` +
-          `💰 *Total Amount to Collect:* ₹${total.toLocaleString('en-IN')}\n` +
-          `💵 *Payment Method:* Cash on Delivery (COD)\n\n` +
-          `📍 *DELIVERY DETAILS:*\n` +
-          `👤 *Customer Name:* ${name}\n` +
-          `📞 *WhatsApp Mobile:* +91 ${phone}\n` +
-          `🏠 *House/Flat/Building:* ${houseNo}\n` +
-          `🛣️ *Street/Area/Landmark:* ${area}\n` +
-          `🏙️ *City & State:* ${city}, ${state}\n` +
-          `📮 *Delivery Pincode:* ${pincode}\n` +
+          `📦 *Order ID:* ${orderId}\n` +
+          `💰 *Amount:* ₹${total.toLocaleString('en-IN')} (Prepaid Online Special)\n` +
+          `🔢 *Quantity:* ${currentQty} Bottle(s) (500ml)\n` +
+          `💳 *Payment Choice:* Cashfree UPI / Online\n\n` +
+          `📍 *DELIVERY ADDRESS:*\n` +
+          `👤 *Name:* ${name}\n` +
+          `📞 *Phone:* +91 ${phone}\n` +
+          `🏠 *House/Building:* ${houseNo}\n` +
+          `🛣️ *Area/Landmark:* ${area}\n` +
+          `🏙️ *City, State:* ${city}, ${state}\n` +
+          `📮 *Pincode:* ${pincode}\n` +
           `----------------------------------------\n` +
-          `Please confirm this COD booking and dispatch my package!`
-        );
+          `Please share your UPI QR code or payment link to complete order!`;
+
+        await sendEvoWhatsAppMessage(phone, evoPrepaidMsg);
+
+        const msg = encodeURIComponent(evoPrepaidMsg);
         showOrderSuccess(deliveryApiPayload, msg);
         window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
       }
