@@ -595,6 +595,16 @@
         <!-- Fast Contact & Shipping Form -->
         <form id="fastOrderForm" onsubmit="handleFastOrderSubmit(event)" class="space-y-2.5 text-left">
           
+          <!-- Auto-fill Saved Address Indicator -->
+          <div id="savedAddressBadge" class="hidden flex items-center justify-between bg-purple-950/40 border border-purple-500/30 px-2.5 py-1.5 rounded-xl text-[10px] text-purple-300">
+            <span class="flex items-center gap-1.5 font-semibold">
+              <i class="fa-solid fa-sparkles text-amber-400"></i> Auto-filled from saved address
+            </span>
+            <button type="button" onclick="clearSavedAddress()" class="text-zinc-400 hover:text-red-400 underline cursor-pointer text-[10px] transition-colors">
+              Clear
+            </button>
+          </div>
+          
           <!-- Full Name -->
           <div>
             <label class="block text-[11px] sm:text-xs font-bold text-slate-300 mb-1">Full Name <span class="text-amber-400">*</span></label>
@@ -1034,9 +1044,96 @@
       }
     }
 
+    // --- Address LocalStorage Persistence & Auto-Fill System ---
+    const ADDRESS_STORAGE_KEY = "aabe_hayat_customer_address";
+
+    function saveAddressToLocalStorage() {
+      try {
+        const addressData = {
+          fullName: document.getElementById("orderFullName")?.value?.trim() || "",
+          phone: document.getElementById("orderPhone")?.value?.trim() || "",
+          houseNo: document.getElementById("orderHouseNo")?.value?.trim() || "",
+          area: document.getElementById("orderArea")?.value?.trim() || "",
+          pincode: document.getElementById("orderPincode")?.value?.trim() || "",
+          city: document.getElementById("orderCity")?.value?.trim() || "",
+          state: document.getElementById("orderState")?.value?.trim() || ""
+        };
+        const hasContent = Object.values(addressData).some(v => v.length > 0);
+        if (hasContent) {
+          localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(addressData));
+          updateSavedAddressBadge(true);
+        }
+      } catch (err) {
+        console.warn("Could not save address to localStorage:", err);
+      }
+    }
+
+    function loadSavedAddress() {
+      try {
+        const raw = localStorage.getItem(ADDRESS_STORAGE_KEY);
+        if (!raw) {
+          updateSavedAddressBadge(false);
+          return false;
+        }
+        const data = JSON.parse(raw);
+        if (data && typeof data === 'object') {
+          if (data.fullName && document.getElementById("orderFullName")) document.getElementById("orderFullName").value = data.fullName;
+          if (data.phone && document.getElementById("orderPhone")) document.getElementById("orderPhone").value = data.phone;
+          if (data.houseNo && document.getElementById("orderHouseNo")) document.getElementById("orderHouseNo").value = data.houseNo;
+          if (data.area && document.getElementById("orderArea")) document.getElementById("orderArea").value = data.area;
+          if (data.pincode && document.getElementById("orderPincode")) document.getElementById("orderPincode").value = data.pincode;
+          if (data.city && document.getElementById("orderCity")) document.getElementById("orderCity").value = data.city;
+          if (data.state && document.getElementById("orderState")) document.getElementById("orderState").value = data.state;
+          updateSavedAddressBadge(true);
+          return true;
+        }
+      } catch (err) {
+        console.warn("Could not load address from localStorage:", err);
+      }
+      updateSavedAddressBadge(false);
+      return false;
+    }
+
+    function clearSavedAddress() {
+      try {
+        localStorage.removeItem(ADDRESS_STORAGE_KEY);
+        const fieldIds = ["orderFullName", "orderPhone", "orderHouseNo", "orderArea", "orderPincode", "orderCity", "orderState"];
+        fieldIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+        updateSavedAddressBadge(false);
+      } catch (err) {
+        console.warn("Could not clear address:", err);
+      }
+    }
+
+    function updateSavedAddressBadge(hasSaved) {
+      const badge = document.getElementById("savedAddressBadge");
+      if (badge) {
+        if (hasSaved) {
+          badge.classList.remove("hidden");
+        } else {
+          badge.classList.add("hidden");
+        }
+      }
+    }
+
+    function attachAddressAutoSaveListeners() {
+      const fieldIds = ["orderFullName", "orderPhone", "orderHouseNo", "orderArea", "orderPincode", "orderCity", "orderState"];
+      fieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", saveAddressToLocalStorage);
+          el.addEventListener("change", saveAddressToLocalStorage);
+        }
+      });
+    }
+
     // Modal Visibility
     function openFastOrderModal() {
       document.getElementById("fastOrderModal").classList.remove("hidden");
+      loadSavedAddress();
       updateCalculatedPrices();
     }
 
@@ -1122,6 +1219,7 @@
 
     function resetAndPlaceNewOrder() {
       document.getElementById("fastOrderForm").reset();
+      loadSavedAddress();
       document.getElementById("fastOrderForm").classList.remove("hidden");
       document.getElementById("modalItemRecap").classList.remove("hidden");
       document.getElementById("orderSuccessView").classList.add("hidden");
@@ -1142,6 +1240,9 @@
       const pincode = document.getElementById("orderPincode").value.trim();
       const city = document.getElementById("orderCity").value.trim();
       const state = document.getElementById("orderState").value.trim();
+
+      // Auto-save/update address in localStorage
+      saveAddressToLocalStorage();
 
       if (phone.length !== 10 || isNaN(phone)) {
         alert("Please enter a valid 10-digit WhatsApp mobile number.");
@@ -1319,8 +1420,12 @@
       }
     }
 
-    // Auto-verify if returning from Cashfree redirect payment
+    // Initialize on page load
     window.addEventListener("DOMContentLoaded", async () => {
+      // Attach auto-save listener to address inputs and load any saved address
+      attachAddressAutoSaveListeners();
+      loadSavedAddress();
+
       const urlParams = new URLSearchParams(window.location.search);
       const returnedOrderId = urlParams.get("cf_order_id") || urlParams.get("order_id");
       if (returnedOrderId) {
