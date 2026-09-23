@@ -811,11 +811,16 @@
             </div>
           </div>
 
-          <!-- WhatsApp Action Button -->
-          <button id="successWhatsAppBtn" onclick="openWhatsAppSuccessChat()" class="w-full cta-gold-btn shimmer py-3.5 px-4 rounded-2xl text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center space-x-2 shadow-xl cursor-pointer">
-            <i class="fa-brands fa-whatsapp text-lg"></i>
-            <span>OPEN WHATSAPP DISPATCH TRACKING</span>
-          </button>
+          <!-- Dispatch & Tracking Status Info (Static, Non-actionable) -->
+          <div class="w-full bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-3.5 text-center shadow-lg space-y-1">
+            <div class="flex items-center justify-center space-x-2 text-emerald-400 font-black text-xs sm:text-sm uppercase tracking-wide">
+              <i class="fa-solid fa-truck-fast text-base"></i>
+              <span>Dispatch In Progress</span>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-normal">
+              Your parcel is being packed and prepared for express shipping. Live tracking details will be shared via WhatsApp / SMS.
+            </p>
+          </div>
 
           <button onclick="resetAndPlaceNewOrder()" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 font-bold py-2.5 px-4 rounded-2xl text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors cursor-pointer">
             <i class="fa-solid fa-arrow-rotate-left text-xs"></i>
@@ -1711,31 +1716,75 @@
           };
 
           cashfree.checkout(checkoutOptions).then(async function (result) {
-            const paymentId = result.paymentDetails?.payment_id || `CF_${Date.now()}`;
+            console.log("Cashfree checkout result:", result);
+
+            // 1. Check if user closed/aborted the modal or payment failed
+            if (result.error) {
+              console.warn("Cashfree checkout cancelled/aborted by customer:", result.error);
+              alert(result.error.message || "Payment was cancelled or could not be completed. You can retry or choose Cash on Delivery.");
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+              }
+              return;
+            }
+
+            if (result.redirect) {
+              console.log("Cashfree redirecting customer to bank/pg...");
+              return;
+            }
+
+            // 2. Verify with Cloudflare Worker backend
+            const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
+            let isVerifiedPaid = false;
+            let verifiedPaymentId = result.paymentDetails?.payment_id || null;
+
+            if (workerUrl) {
+              try {
+                const vRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    order_id: orderId,
+                    cf_order_id: saveResult?.cashfree?.cf_order_id || saveResult?.payment?.cashfree_order_id,
+                    payment_id: verifiedPaymentId
+                  })
+                });
+                const vData = await vRes.json();
+                if (vData.success) {
+                  isVerifiedPaid = true;
+                  if (vData.order?.payment?.cashfree_payment_id) {
+                    verifiedPaymentId = vData.order.payment.cashfree_payment_id;
+                  }
+                }
+              } catch (vErr) {
+                console.warn("Backend payment verification error:", vErr);
+              }
+            }
+
+            // Also check result.paymentDetails if direct status indicates success
+            if (!isVerifiedPaid && result.paymentDetails && (result.paymentDetails.payment_status === 'SUCCESS' || result.paymentDetails.paymentStatus === 'SUCCESS')) {
+              isVerifiedPaid = true;
+            }
+
+            // 3. If payment was NOT completed or was aborted, DO NOT CONFIRM!
+            if (!isVerifiedPaid) {
+              console.warn("Payment was aborted or not verified.");
+              alert("Payment was not completed. If money was deducted, your order will be confirmed shortly. You can also retry or choose Cash on Delivery.");
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+              }
+              return;
+            }
+
+            // 4. Genuine Payment Verified: update order & notify
+            const paymentId = verifiedPaymentId || result.paymentDetails?.payment_id || `CF_${Date.now()}`;
             onlinePayload.payment.status = "PAID_ONLINE";
             onlinePayload.payment.cashfree_payment_id = paymentId;
             onlinePayload.payment.method = "CASHFREE";
             onlinePayload.payment.provider = "CASHFREE";
             onlinePayload.status = "CONFIRMED";
-
-            // Verify on Cloudflare Worker backend
-            const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
-            if (workerUrl) {
-              try {
-                await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    order_id: orderId,
-                    cf_order_id: saveResult?.cashfree?.cf_order_id,
-                    payment_id: paymentId,
-                    verified: !result.error
-                  })
-                });
-              } catch (vErr) {
-                console.warn("Backend payment verification error:", vErr);
-              }
-            }
 
             await saveOrderToDatabase(onlinePayload);
 
@@ -1744,7 +1793,7 @@
               `----------------------------------------\n` +
               `📦 *Order ID:* ${orderId}\n` +
               `💳 *Payment ID:* ${paymentId}\n` +
-              `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid ₹100 Discount Applied)\n` +
+              `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid Discount Applied)\n` +
               `👤 *Customer Name:* ${name}\n` +
               `📞 *WhatsApp Mobile:* +91 ${phone}\n` +
               `🌿 *Product:* AAB-E-HAYAT Natural Botanical Drink (500ml)\n` +
@@ -1761,44 +1810,28 @@
 
             const msg = encodeURIComponent(evoOnlineMsg);
             showOrderSuccess(onlinePayload, msg);
-            window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
           }).catch(function (cfErr) {
             console.warn("Cashfree checkout popup closed or cancelled by customer:", cfErr);
-            // The order remains in Firebase RTDB with 'PAYMENT_PENDING' so admin can follow up!
+            alert("Payment checkout was cancelled or closed.");
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+            }
           });
         } catch (sdkErr) {
           console.error("Cashfree checkout error:", sdkErr);
-          alert("Could not load Cashfree checkout modal. Redirecting to WhatsApp to complete order.");
-          const fallbackMsg = encodeURIComponent(
-            `*💳 PREPAID ONLINE ORDER - CASHFREE*\n` +
-            `Order ID: ${orderId}\nAmount: ₹${total}\nQuantity: ${currentQty}\nName: ${name}\nPhone: ${phone}`
-          );
-          showOrderSuccess(onlinePayload, fallbackMsg);
-          window.open(`https://wa.me/918329494445?text=${fallbackMsg}`, '_blank');
+          alert("Could not load Cashfree checkout modal. You can place your order with Cash on Delivery (COD).");
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+          }
         }
       } else {
-        // Direct WhatsApp prepaid confirmation fallback
-        const evoPrepaidMsg = `*💳 PREPAID ONLINE ORDER - AAB-E-HAYAT*\n` +
-          `----------------------------------------\n` +
-          `📦 *Order ID:* ${orderId}\n` +
-          `💰 *Amount:* ₹${total.toLocaleString('en-IN')} (Prepaid Online Special)\n` +
-          `🔢 *Quantity:* ${currentQty} Bottle(s) (500ml)\n` +
-          `💳 *Payment Choice:* Cashfree UPI / Online\n\n` +
-          `📍 *DELIVERY ADDRESS:*\n` +
-          `👤 *Name:* ${name}\n` +
-          `📞 *Phone:* +91 ${phone}\n` +
-          `🏠 *House/Building:* ${houseNo}\n` +
-          `🛣️ *Area/Landmark:* ${area}\n` +
-          `🏙️ *City, State:* ${city}, ${state}\n` +
-          `📮 *Pincode:* ${pincode}\n` +
-          `----------------------------------------\n` +
-          `Please share your UPI QR code or payment link to complete order!`;
-
-        await sendEvoWhatsAppMessage(phone, evoPrepaidMsg);
-
-        const msg = encodeURIComponent(evoPrepaidMsg);
-        showOrderSuccess(onlinePayload, msg);
-        window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
+        alert("Online payment gateway could not be loaded. Please select Cash on Delivery (COD) or try again.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+        }
       }
     }
 
@@ -1810,17 +1843,25 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const returnedOrderId = urlParams.get("cf_order_id") || urlParams.get("order_id");
+      const returnedStatus = urlParams.get("status");
+      
       if (returnedOrderId) {
+        if (returnedStatus === "FAILED" || returnedStatus === "CANCELLED" || returnedStatus === "USER_DROPPED" || returnedStatus === "TERMINATED") {
+          console.warn("Payment returned with aborted/failed status:", returnedStatus);
+          alert("Payment was not completed (" + returnedStatus + "). You can retry or choose Cash on Delivery.");
+          return;
+        }
+
         const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
         if (workerUrl) {
           try {
             const vRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/payments/verify`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ order_id: returnedOrderId, verified: true })
+              body: JSON.stringify({ order_id: returnedOrderId })
             });
             const vData = await vRes.json();
-            if (vData.success && vData.order) {
+            if (vData.success && vData.order && (vData.order.payment?.status === 'PAID_ONLINE' || vData.order.status === 'CONFIRMED')) {
               openFastOrderModal();
               showOrderSuccess(vData.order, encodeURIComponent(`*✅ CONFIRMED ONLINE ORDER - CASHFREE*\nOrder ID: ${returnedOrderId}`));
             }
