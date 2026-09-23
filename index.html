@@ -354,7 +354,7 @@
               </div>
               <div class="flex items-baseline justify-between w-full">
                 <span id="pagePrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,400</span>
-                <span class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
+                <span id="pagePrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
               </div>
             </button>
           </div>
@@ -377,6 +377,30 @@
               <span>Pay Online (₹1,400)</span>
             </button>
           </div>
+
+          <!-- Special Buy 2 on Prepaid Discount Deal (₹2,600 • Save ₹400) -->
+          <button type="button" onclick="buyTwoPrepaidDeal()" id="buyTwoPrepaidBtn" class="w-full bg-gradient-to-r from-emerald-950 via-zinc-900 to-emerald-950 hover:from-emerald-900/90 hover:to-zinc-900 border-2 border-emerald-400/90 text-white rounded-2xl p-3 text-center cursor-pointer shadow-xl transition-all active:scale-[0.98] group relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5 text-left">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/60 flex items-center justify-center text-emerald-400 text-sm flex-shrink-0 shadow-inner">
+                  <i class="fa-solid fa-gift"></i>
+                </div>
+                <div>
+                  <div class="text-xs sm:text-sm font-black text-emerald-400 flex items-center gap-1.5 uppercase tracking-wide">
+                    <span>BUY 2 ON PREPAID & GET FOR ₹2,600</span>
+                    <span class="bg-emerald-500 text-slate-950 font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow">SAVE ₹400</span>
+                  </div>
+                  <div class="text-[10px] text-slate-300">
+                    Flat ₹400 Instant Discount (₹1,300/bottle • Extra bottles @ +₹1,300)
+                  </div>
+                </div>
+              </div>
+              <div class="text-right pl-2 flex-shrink-0">
+                <div class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹2,600</div>
+                <div class="text-[9px] text-slate-400 line-through">₹3,000</div>
+              </div>
+            </div>
+          </button>
         </div>
 
         <!-- 4-Item Assurance Badges Grid -->
@@ -692,7 +716,7 @@
                 </div>
                 <div class="mt-1.5 pt-1 border-t border-zinc-800/80 flex items-baseline justify-between">
                   <span id="modalPrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,400</span>
-                  <span class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
+                  <span id="modalPrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
                 </div>
               </label>
 
@@ -857,14 +881,30 @@
   <script>
     document.getElementById("currentYearSpan").innerText = new Date().getFullYear();
 
-    // Actual pricing: COD is 1500, Prepaid is 1400 (with ₹100 instant online discount)
+    // Actual pricing: COD is 1500/bottle. Prepaid is 1400 for 1 bottle; 2 bottles for 2600 (Save ₹400), and +1300 for each additional bottle
     const COD_UNIT_PRICE = 1500;
-    const PREPAID_UNIT_PRICE = 1400;
     const ORIGINAL_UNIT_PRICE = 3000;
     let selectedPaymentMethod = "COD"; // "COD" or "CASHFREE"
     let currentQty = 1;
     let currentSlide = 0;
     const totalSlides = 2;
+
+    function getPrepaidTotal(qty) {
+      if (qty <= 1) return 1400;
+      return qty * 1300; // 2 bottles = 2600 (Save ₹400), 3 bottles = 3900 (2600+1300), etc.
+    }
+
+    function getCodTotal(qty) {
+      return qty * 1500;
+    }
+
+    function buyTwoPrepaidDeal() {
+      currentQty = 2;
+      const qtyEl = document.getElementById("qtyDisplay");
+      if (qtyEl) qtyEl.innerText = "2";
+      setPaymentMethod("CASHFREE");
+      openFastOrderModal();
+    }
 
     // Verified Firebase Configuration for aabe-hayat Realtime Database
     const firebaseConfig = {
@@ -1012,13 +1052,14 @@
     }
 
     function updateCalculatedPrices() {
-      const activeUnitPrice = (selectedPaymentMethod === "CASHFREE") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
-      const total = activeUnitPrice * currentQty;
-      const codTotal = COD_UNIT_PRICE * currentQty;
-      const prepaidTotal = PREPAID_UNIT_PRICE * currentQty;
+      const isPrepaid = (selectedPaymentMethod === "CASHFREE");
+      const codTotal = getCodTotal(currentQty);
+      const prepaidTotal = getPrepaidTotal(currentQty);
+      const total = isPrepaid ? prepaidTotal : codTotal;
       const totalOrig = ORIGINAL_UNIT_PRICE * currentQty;
       const savings = totalOrig - total;
       const discountPercent = Math.round((savings / totalOrig) * 100);
+      const prepaidVsCodSavings = codTotal - prepaidTotal;
 
       // Main product price display
       const displayPriceEl = document.getElementById("displayPrice");
@@ -1029,8 +1070,12 @@
       
       const displayDiscountEl = document.getElementById("displayDiscountBadge");
       if (displayDiscountEl) {
-        if (selectedPaymentMethod === "CASHFREE") {
-          displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID SPECIAL - ${discountPercent}% OFF)`;
+        if (isPrepaid) {
+          if (currentQty >= 2) {
+            displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID: ₹1,300/BOTTLE • SAVE ₹${prepaidVsCodSavings.toLocaleString('en-IN')} EXTRA)`;
+          } else {
+            displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID SPECIAL - ${discountPercent}% OFF)`;
+          }
         } else {
           displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (${discountPercent}% OFF)`;
         }
@@ -1043,6 +1088,11 @@
       const pagePrepaidEl = document.getElementById("pagePrepaidAmount");
       if (pagePrepaidEl) pagePrepaidEl.innerText = `₹${prepaidTotal.toLocaleString('en-IN')}`;
 
+      const pagePrepaidSaveBadge = document.getElementById("pagePrepaidSaveBadge");
+      if (pagePrepaidSaveBadge) {
+        pagePrepaidSaveBadge.innerText = `Save ₹${prepaidVsCodSavings.toLocaleString('en-IN')}`;
+      }
+
       // Amounts in the single-row selector (Modal)
       const modalCodEl = document.getElementById("modalCodAmount");
       if (modalCodEl) modalCodEl.innerText = `₹${codTotal.toLocaleString('en-IN')}`;
@@ -1050,10 +1100,15 @@
       const modalPrepaidEl = document.getElementById("modalPrepaidAmount");
       if (modalPrepaidEl) modalPrepaidEl.innerText = `₹${prepaidTotal.toLocaleString('en-IN')}`;
 
+      const modalPrepaidSaveBadge = document.getElementById("modalPrepaidSaveBadge");
+      if (modalPrepaidSaveBadge) {
+        modalPrepaidSaveBadge.innerText = `Save ₹${prepaidVsCodSavings.toLocaleString('en-IN')}`;
+      }
+
       // Main CTA button on page
       const mainCtaText = document.getElementById("mainCtaText");
       if (mainCtaText) {
-        if (selectedPaymentMethod === "CASHFREE") {
+        if (isPrepaid) {
           mainCtaText.innerText = `PAY ONLINE NOW - PREPAID (₹${total.toLocaleString('en-IN')})`;
         } else {
           mainCtaText.innerText = `ORDER NOW - CASH ON DELIVERY (₹${total.toLocaleString('en-IN')})`;
@@ -1074,15 +1129,15 @@
       if (modalQtySummary) modalQtySummary.innerText = `(Qty: ${currentQty})`;
       
       const modalPackSummary = document.getElementById("modalPackSummary");
-      if (modalPackSummary) modalPackSummary.innerText = `${currentQty} Bottle${currentQty > 1 ? 's' : ''} (${currentQty * 500}ml Net Volume) • ${selectedPaymentMethod === 'CASHFREE' ? 'Prepaid Online' : 'Cash on Delivery'}`;
+      if (modalPackSummary) modalPackSummary.innerText = `${currentQty} Bottle${currentQty > 1 ? 's' : ''} (${currentQty * 500}ml Net Volume) • ${isPrepaid ? 'Prepaid Online' : 'Cash on Delivery'}`;
 
       // Modal Submit Button
       const submitBtnText = document.getElementById("modalSubmitBtnText");
       if (submitBtnText) {
-        if (selectedPaymentMethod === "COD") {
+        if (!isPrepaid) {
           submitBtnText.innerText = `CONFIRM CASH ON DELIVERY ORDER (₹${total.toLocaleString('en-IN')})`;
         } else {
-          submitBtnText.innerText = `PAY NOW VIA CASHFREE / UPI (Test Pay: ₹1)`;
+          submitBtnText.innerText = `PAY ONLINE NOW (₹${total.toLocaleString('en-IN')})`;
         }
       }
     }
@@ -1240,7 +1295,7 @@
     // --- Evolution API WhatsApp Messaging System ---
     const EVO_CONFIG = {
       baseUrl: "https://evo.infispark.in",
-      instance: "mudassir",
+      instance: "aabe",
       apiKey: "vR39h6avY69g7kAU3YQbS6V6XEvudson"
     };
 
@@ -1311,7 +1366,16 @@
     async function resendCodOtp() {
       if (!pendingCodOrder) return;
       const resendBtn = document.getElementById("resendOtpBtn");
+      const resendText = document.getElementById("resendOtpText");
       if (resendBtn && resendBtn.disabled) return;
+
+      if (resendBtn) {
+        resendBtn.disabled = true;
+        resendBtn.classList.add("opacity-60", "cursor-not-allowed");
+      }
+      if (resendText) {
+        resendText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Sending...';
+      }
 
       const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
       pendingCodOrder.otp = newOtp;
@@ -1328,6 +1392,12 @@
       clearInterval(otpCountdownInterval);
       document.getElementById("codOtpVerificationView").classList.add("hidden");
       document.getElementById("fastOrderForm").classList.remove("hidden");
+      const submitBtn = document.getElementById("modalSubmitBtn");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+      }
+      updateCalculatedPrices();
     }
 
     async function verifyCodOtpAndPlaceOrder() {
@@ -1335,6 +1405,8 @@
       const inputEl = document.getElementById("codOtpInput");
       const enteredOtp = (inputEl ? inputEl.value : "").trim();
       const errorEl = document.getElementById("otpErrorMsg");
+      const verifyBtn = document.getElementById("verifyOtpBtn");
+      const verifyBtnText = document.getElementById("verifyOtpBtnText");
 
       if (!enteredOtp || enteredOtp.length !== 4) {
         if (errorEl) {
@@ -1359,51 +1431,61 @@
 
       // OTP is valid! Proceed with COD booking
       if (errorEl) errorEl.classList.add("hidden");
-      const verifyBtn = document.getElementById("verifyOtpBtn");
       if (verifyBtn) {
         verifyBtn.disabled = true;
-        document.getElementById("verifyOtpBtnText").innerText = "CONFIRMING ORDER...";
+        verifyBtn.classList.add("opacity-75", "cursor-not-allowed");
+      }
+      if (verifyBtnText) {
+        verifyBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> CONFIRMING & BOOKING DISPATCH...';
       }
 
-      const orderPayload = pendingCodOrder.payload;
-      orderPayload.status = "CONFIRMED";
-      orderPayload.payment.otp_verified = true;
-      orderPayload.payment.status = "PENDING_COD";
+      try {
+        const orderPayload = pendingCodOrder.payload;
+        orderPayload.status = "CONFIRMED";
+        orderPayload.payment.otp_verified = true;
+        orderPayload.payment.status = "PENDING_COD";
 
-      // 1. Save order to Database / Cloudflare Worker
-      await saveOrderToDatabase(orderPayload);
+        // 1. Save confirmed order to Database / Cloudflare Worker
+        await saveOrderToDatabase(orderPayload);
 
-      // 2. Send Automated WhatsApp Confirmation via Evolution API
-      const evoConfirmMsg = `🌿 *AAB-E-HAYAT™ - COD ORDER CONFIRMED*\n` +
-        `----------------------------------------\n` +
-        `📦 *Order ID:* ${orderPayload.order_id}\n` +
-        `👤 *Customer Name:* ${pendingCodOrder.name}\n` +
-        `📞 *WhatsApp Mobile:* +91 ${pendingCodOrder.phone}\n` +
-        `🌿 *Product:* AAB-E-HAYAT™ Natural Botanical Drink (500ml)\n` +
-        `🔢 *Quantity:* ${pendingCodOrder.quantity} Bottle(s)\n` +
-        `💰 *Amount to Collect at Delivery:* ₹${pendingCodOrder.total.toLocaleString('en-IN')} (COD)\n` +
-        `💵 *Payment Method:* Cash on Delivery (COD - OTP Verified ✅)\n\n` +
-        `📍 *DELIVERY ADDRESS:*\n` +
-        `🏠 ${pendingCodOrder.houseNo}\n` +
-        `🛣️ ${pendingCodOrder.area}\n` +
-        `🏙️ ${pendingCodOrder.city}, ${pendingCodOrder.state} - ${pendingCodOrder.pincode}\n` +
-        `----------------------------------------\n` +
-        `🚚 Your COD order is confirmed! Our dispatch team is packaging your bottle(s) for express delivery.\n` +
-        `📞 WhatsApp Concierge: +91 83294 94445`;
+        // 2. Send Automated WhatsApp Confirmation via Evolution API
+        const evoConfirmMsg = `🌿 *AAB-E-HAYAT™ - COD ORDER CONFIRMED*\n` +
+          `----------------------------------------\n` +
+          `📦 *Order ID:* ${orderPayload.order_id}\n` +
+          `👤 *Customer Name:* ${pendingCodOrder.name}\n` +
+          `📞 *WhatsApp Mobile:* +91 ${pendingCodOrder.phone}\n` +
+          `🌿 *Product:* AAB-E-HAYAT™ Natural Botanical Drink (500ml)\n` +
+          `🔢 *Quantity:* ${pendingCodOrder.quantity} Bottle(s)\n` +
+          `💰 *Amount to Collect at Delivery:* ₹${pendingCodOrder.total.toLocaleString('en-IN')} (COD)\n` +
+          `💵 *Payment Method:* Cash on Delivery (COD - OTP Verified ✅)\n\n` +
+          `📍 *DELIVERY ADDRESS:*\n` +
+          `🏠 ${pendingCodOrder.houseNo}\n` +
+          `🛣️ ${pendingCodOrder.area}\n` +
+          `🏙️ ${pendingCodOrder.city}, ${pendingCodOrder.state} - ${pendingCodOrder.pincode}\n` +
+          `----------------------------------------\n` +
+          `🚚 Your COD order is confirmed! Our dispatch team is packaging your bottle(s) for express delivery.\n` +
+          `📞 WhatsApp Concierge: +91 83294 94445`;
 
-      await sendEvoWhatsAppMessage(pendingCodOrder.phone, evoConfirmMsg);
+        await sendEvoWhatsAppMessage(pendingCodOrder.phone, evoConfirmMsg);
 
-      // 3. Fallback WhatsApp Link Message
-      const waMsg = encodeURIComponent(evoConfirmMsg);
+        // 3. Fallback WhatsApp Link Message
+        const waMsg = encodeURIComponent(evoConfirmMsg);
 
-      if (verifyBtn) {
-        verifyBtn.disabled = false;
-        document.getElementById("verifyOtpBtnText").innerText = "VERIFY & CONFIRM COD ORDER";
+        clearInterval(otpCountdownInterval);
+        document.getElementById("codOtpVerificationView").classList.add("hidden");
+        showOrderSuccess(orderPayload, waMsg);
+      } catch (confirmErr) {
+        console.error("Error confirming COD order:", confirmErr);
+        alert("There was an issue finalizing your order. Please try again or reach out on WhatsApp.");
+      } finally {
+        if (verifyBtn) {
+          verifyBtn.disabled = false;
+          verifyBtn.classList.remove("opacity-75", "cursor-not-allowed");
+        }
+        if (verifyBtnText) {
+          verifyBtnText.innerText = "VERIFY & CONFIRM COD ORDER";
+        }
       }
-
-      clearInterval(otpCountdownInterval);
-      document.getElementById("codOtpVerificationView").classList.add("hidden");
-      showOrderSuccess(orderPayload, waMsg);
     }
 
     let latestWhatsAppMsg = "";
@@ -1439,6 +1521,11 @@
       document.getElementById("codOtpVerificationView").classList.add("hidden");
       document.getElementById("modalItemRecap").classList.remove("hidden");
       document.getElementById("orderSuccessView").classList.add("hidden");
+      const submitBtn = document.getElementById("modalSubmitBtn");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+      }
       currentQty = 1;
       document.getElementById("qtyDisplay").innerText = "1";
       setPaymentMethod("COD");
@@ -1472,15 +1559,106 @@
         return;
       }
 
-      const activeUnitPrice = (selectedPaymentMethod === "CASHFREE") ? PREPAID_UNIT_PRICE : COD_UNIT_PRICE;
-      const total = activeUnitPrice * currentQty;
+      const total = (selectedPaymentMethod === "CASHFREE") ? getPrepaidTotal(currentQty) : getCodTotal(currentQty);
+      const activeUnitPrice = Math.round(total / currentQty);
       const orderId = "EH-" + Date.now().toString().slice(-6);
 
       const submitBtn = document.getElementById("modalSubmitBtn");
-      submitBtn.disabled = true;
-      submitBtn.classList.add("opacity-75");
+      const submitBtnText = document.getElementById("modalSubmitBtnText");
 
-      const deliveryApiPayload = {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-75", "cursor-not-allowed");
+      }
+
+      if (selectedPaymentMethod === "COD") {
+        if (submitBtnText) {
+          submitBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> SENDING OTP TO WHATSAPP...';
+        }
+
+        const codDraftPayload = {
+          order_id: orderId,
+          order_date: new Date().toISOString(),
+          product: {
+            name: "AAB-E-HAYAT™ Natural Botanical Drink (500ml)",
+            brand: "EMPIRE Global Herbal Science",
+            sku: "AAB-HAYAT-500ML",
+            volume: "500ml",
+            quantity: currentQty,
+            unit_price: activeUnitPrice,
+            total_amount: total
+          },
+          shipping_address: {
+            recipient_name: name,
+            phone: "+91 " + phone,
+            house_building_no: houseNo,
+            area_landmark: area,
+            city: city,
+            state: state,
+            pincode: pincode,
+            country: "India"
+          },
+          payment: {
+            method: "COD",
+            provider: "COD",
+            status: "OTP_NOT_VERIFIED",
+            otp_verified: false,
+            currency: "INR",
+            amount: total
+          },
+          status: "OTP_NOT_VERIFIED"
+        };
+
+        // 1. Instantly save lead in Firebase RTDB with 'OTP_NOT_VERIFIED'
+        // If user drops off without entering OTP, admin sees this order and can follow up!
+        try {
+          await saveOrderToDatabase(codDraftPayload);
+        } catch (saveErr) {
+          console.warn("Saving pending COD draft order notice:", saveErr);
+        }
+
+        // 2. Generate and dispatch OTP via WhatsApp Evolution API
+        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        pendingCodOrder = {
+          payload: codDraftPayload,
+          otp: generatedOtp,
+          name,
+          phone,
+          houseNo,
+          area,
+          pincode,
+          city,
+          state,
+          quantity: currentQty,
+          total
+        };
+
+        const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Drink*\n\nYour Cash on Delivery (COD) verification code is: *${generatedOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your WhatsApp number and confirm your order.\n📦 Amount to pay at delivery: ₹${total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
+        
+        await sendEvoWhatsAppMessage(phone, otpMsg);
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+        }
+        updateCalculatedPrices();
+
+        document.getElementById("fastOrderForm").classList.add("hidden");
+        document.getElementById("otpRecipientPhone").innerText = "+91 " + phone;
+        document.getElementById("otpErrorMsg").classList.add("hidden");
+        document.getElementById("codOtpInput").value = "";
+        document.getElementById("codOtpVerificationView").classList.remove("hidden");
+        document.getElementById("codOtpInput").focus();
+        startOtpCountdown(30);
+        return;
+      }
+
+      // Online (UPI / Cashfree) Payment Flow
+      if (submitBtnText) {
+        submitBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> INITIALIZING SECURE PAYMENT...';
+      }
+
+      const onlinePayload = {
         order_id: orderId,
         order_date: new Date().toISOString(),
         product: {
@@ -1503,54 +1681,24 @@
           country: "India"
         },
         payment: {
-          method: selectedPaymentMethod,
-          provider: selectedPaymentMethod,
-          status: selectedPaymentMethod === "COD" ? "PENDING_COD" : "PREPAID_ONLINE",
+          method: "CASHFREE",
+          provider: "CASHFREE",
+          status: "PAYMENT_PENDING",
           currency: "INR",
           amount: total
         },
-        status: selectedPaymentMethod === "COD" ? "PENDING_COD" : "PENDING_PAYMENT"
+        status: "PAYMENT_PENDING"
       };
 
-      if (selectedPaymentMethod === "COD") {
-        // Cash on Delivery: Trigger WhatsApp OTP Verification Flow
-        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-        pendingCodOrder = {
-          payload: deliveryApiPayload,
-          otp: generatedOtp,
-          name,
-          phone,
-          houseNo,
-          area,
-          pincode,
-          city,
-          state,
-          quantity: currentQty,
-          total
-        };
+      // 1. Instantly save order with status 'PAYMENT_PENDING'
+      // If user abandons/closes the payment gateway, admin sees details with 'Payment Pending'!
+      const saveResult = await saveOrderToDatabase(onlinePayload);
 
-        const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Drink*\n\nYour Cash on Delivery (COD) verification code is: *${generatedOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your WhatsApp number and confirm your order.\n📦 Amount to pay at delivery: ₹${total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
-        
-        await sendEvoWhatsAppMessage(phone, otpMsg);
-
+      if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.classList.remove("opacity-75");
-
-        document.getElementById("fastOrderForm").classList.add("hidden");
-        document.getElementById("otpRecipientPhone").innerText = "+91 " + phone;
-        document.getElementById("otpErrorMsg").classList.add("hidden");
-        document.getElementById("codOtpInput").value = "";
-        document.getElementById("codOtpVerificationView").classList.remove("hidden");
-        document.getElementById("codOtpInput").focus();
-        startOtpCountdown(30);
-        return;
+        submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
       }
-
-      // Online (Cashfree) Payment Flow
-      const saveResult = await saveOrderToDatabase(deliveryApiPayload);
-
-      submitBtn.disabled = false;
-      submitBtn.classList.remove("opacity-75");
+      updateCalculatedPrices();
 
       const paymentSessionId = saveResult?.payment_session_id || saveResult?.cashfree?.payment_session_id;
 
@@ -1564,11 +1712,11 @@
 
           cashfree.checkout(checkoutOptions).then(async function (result) {
             const paymentId = result.paymentDetails?.payment_id || `CF_${Date.now()}`;
-            deliveryApiPayload.payment.status = "PAID_ONLINE";
-            deliveryApiPayload.payment.cashfree_payment_id = paymentId;
-            deliveryApiPayload.payment.method = "CASHFREE";
-            deliveryApiPayload.payment.provider = "CASHFREE";
-            deliveryApiPayload.status = "CONFIRMED";
+            onlinePayload.payment.status = "PAID_ONLINE";
+            onlinePayload.payment.cashfree_payment_id = paymentId;
+            onlinePayload.payment.method = "CASHFREE";
+            onlinePayload.payment.provider = "CASHFREE";
+            onlinePayload.status = "CONFIRMED";
 
             // Verify on Cloudflare Worker backend
             const workerUrl = window.CLOUDFLARE_WORKER_URL || localStorage.getItem("WORKER_API_URL") || "";
@@ -1589,7 +1737,7 @@
               }
             }
 
-            await saveOrderToDatabase(deliveryApiPayload);
+            await saveOrderToDatabase(onlinePayload);
 
             // Automated WhatsApp confirmation via Evolution API
             const evoOnlineMsg = `✅ *AAB-E-HAYAT™ - ONLINE PAYMENT CONFIRMED*\n` +
@@ -1612,10 +1760,11 @@
             await sendEvoWhatsAppMessage(phone, evoOnlineMsg);
 
             const msg = encodeURIComponent(evoOnlineMsg);
-            showOrderSuccess(deliveryApiPayload, msg);
+            showOrderSuccess(onlinePayload, msg);
             window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
           }).catch(function (cfErr) {
-            console.warn("Cashfree checkout popup error/closed:", cfErr);
+            console.warn("Cashfree checkout popup closed or cancelled by customer:", cfErr);
+            // The order remains in Firebase RTDB with 'PAYMENT_PENDING' so admin can follow up!
           });
         } catch (sdkErr) {
           console.error("Cashfree checkout error:", sdkErr);
@@ -1624,7 +1773,7 @@
             `*💳 PREPAID ONLINE ORDER - CASHFREE*\n` +
             `Order ID: ${orderId}\nAmount: ₹${total}\nQuantity: ${currentQty}\nName: ${name}\nPhone: ${phone}`
           );
-          showOrderSuccess(deliveryApiPayload, fallbackMsg);
+          showOrderSuccess(onlinePayload, fallbackMsg);
           window.open(`https://wa.me/918329494445?text=${fallbackMsg}`, '_blank');
         }
       } else {
@@ -1648,7 +1797,7 @@
         await sendEvoWhatsAppMessage(phone, evoPrepaidMsg);
 
         const msg = encodeURIComponent(evoPrepaidMsg);
-        showOrderSuccess(deliveryApiPayload, msg);
+        showOrderSuccess(onlinePayload, msg);
         window.open(`https://wa.me/918329494445?text=${msg}`, '_blank');
       }
     }
