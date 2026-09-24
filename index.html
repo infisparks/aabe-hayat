@@ -324,9 +324,9 @@
               <span class="text-xs font-black text-white">1 Bottle (500ml Net Vol.)</span>
             </div>
             <div class="flex items-baseline space-x-1.5 pt-0.5">
-              <span id="displayPrice" class="text-base sm:text-lg font-black text-amber-400 font-mono">₹1,500</span>
-              <span id="displayOriginalPrice" class="text-[10px] text-slate-500 line-through font-mono">₹3,000</span>
-              <span id="displayDiscountBadge" class="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded">SAVE ₹1,500 (50% OFF)</span>
+              <span id="displayPrice" class="text-base sm:text-lg font-black text-amber-400 font-mono">₹750</span>
+              <span id="displayOriginalPrice" class="text-[10px] text-slate-500 line-through font-mono">₹1,500</span>
+              <span id="displayDiscountBadge" class="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded">SAVE ₹750 (50% OFF)</span>
             </div>
           </div>
 
@@ -360,7 +360,7 @@
                 </span>
               </div>
               <div class="flex items-baseline justify-between w-full">
-                <span id="pageCodAmount" class="text-xs sm:text-sm font-black text-amber-400 font-mono">₹1,500</span>
+                <span id="pageCodAmount" class="text-xs sm:text-sm font-black text-amber-400 font-mono">₹750</span>
                 <span class="text-[9px] text-slate-400">Pay at Doorstep</span>
               </div>
             </button>
@@ -374,7 +374,7 @@
                 <span class="page-radio-dot w-3.5 h-3.5 rounded-full border border-zinc-600 bg-transparent flex items-center justify-center flex-shrink-0"></span>
               </div>
               <div class="flex items-baseline justify-between w-full">
-                <span id="pagePrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,400</span>
+                <span id="pagePrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹650</span>
                 <span id="pagePrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
               </div>
             </button>
@@ -385,21 +385,21 @@
         <div class="space-y-2 pt-1">
           <button onclick="openFastOrderModal()" id="mainCtaBtn" class="w-full cta-gold-btn shimmer py-3.5 px-4 rounded-2xl text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center space-x-2 shadow-xl cursor-pointer">
             <i id="mainCtaIcon" class="fa-solid fa-truck-fast text-lg"></i>
-            <span id="mainCtaText">ORDER NOW - CASH ON DELIVERY (₹1,500)</span>
+            <span id="mainCtaText">ORDER NOW - CASH ON DELIVERY (₹750)</span>
           </button>
 
           <div class="grid grid-cols-2 gap-2">
             <button onclick="openFastOrderModalWith('COD')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-amber-400/60 text-amber-400 font-bold py-2.5 px-2 rounded-xl text-[11px] sm:text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors shadow cursor-pointer">
               <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
-              <span>Order COD (₹1,500)</span>
+              <span>Order COD (₹750)</span>
             </button>
             <button onclick="openFastOrderModalWith('CASHFREE')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-emerald-400/60 text-emerald-400 font-bold py-2.5 px-2 rounded-xl text-[11px] sm:text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors shadow cursor-pointer">
               <i class="fa-solid fa-bolt text-xs"></i>
-              <span>Pay Online (₹1,400)</span>
+              <span>Pay Online (₹650)</span>
             </button>
           </div>
 
-          <!-- Special Buy 2 on Prepaid Discount Deal (₹2,600 • Save ₹400) -->
+          <!-- Special Buy 2 on Prepaid Discount Deal (₹1,200 • Save ₹300) -->
           <button type="button" onclick="buyTwoPrepaidDeal()" id="buyTwoPrepaidBtn" class="w-full bg-gradient-to-r from-emerald-950 via-zinc-900 to-emerald-950 hover:from-emerald-900/90 hover:to-zinc-900 border-2 border-emerald-400/90 text-white rounded-2xl p-3 text-center cursor-pointer shadow-xl transition-all active:scale-[0.98] group relative overflow-hidden">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center space-x-2.5 text-left min-w-0 flex-1">
@@ -409,16 +409,16 @@
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-1.5 flex-wrap">
                     <span class="text-xs sm:text-sm font-black text-emerald-400 uppercase tracking-wide">BUY 2 ON PREPAID</span>
-                    <span class="bg-emerald-400 text-slate-950 font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow whitespace-nowrap shrink-0">SAVE ₹400</span>
+                    <span class="bg-emerald-400 text-slate-950 font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow whitespace-nowrap shrink-0">SAVE ₹300</span>
                   </div>
                   <div class="text-[10px] text-slate-300">
-                    Flat ₹400 Instant Discount (₹1,300/bottle • Extra bottles @ +₹1,300)
+                    Flat ₹300 Instant Discount (₹600/bottle • Extra bottles @ +₹600)
                   </div>
                 </div>
               </div>
               <div class="text-right pl-2 flex-shrink-0">
-                <div class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹2,600</div>
-                <div class="text-[9px] text-slate-400 line-through">₹3,000</div>
+                <div class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,200</div>
+                <div class="text-[9px] text-slate-400 line-through">₹1,500</div>
               </div>
             </div>
           </button>
@@ -630,7 +630,7 @@
           <div class="overflow-hidden flex-1">
             <h5 class="text-xs font-black text-white truncate">AAB-E-HAYAT Natural Botanical Juice</h5>
             <p id="modalPackSummary" class="text-[10px] text-amber-400 font-bold">1 Bottle (500ml Net Volume)</p>
-            <p class="text-amber-400 font-black text-xs"><span id="modalTotalSummary">₹1,500</span> <span id="modalQtySummary" class="text-[10px] text-slate-400 font-normal">(Qty: 1)</span></p>
+            <p class="text-amber-400 font-black text-xs"><span id="modalTotalSummary">₹750</span> <span id="modalQtySummary" class="text-[10px] text-slate-400 font-normal">(Qty: 1)</span></p>
           </div>
           <div class="text-right text-[10px] text-emerald-400 font-bold flex-shrink-0">
             <i class="fa-solid fa-truck-fast"></i> Free Delivery
@@ -720,7 +720,7 @@
                   </span>
                 </div>
                 <div class="mt-1.5 pt-1 border-t border-zinc-800/80 flex items-baseline justify-between">
-                  <span id="modalCodAmount" class="text-xs sm:text-sm font-black text-amber-400 font-mono">₹1,500</span>
+                  <span id="modalCodAmount" class="text-xs sm:text-sm font-black text-amber-400 font-mono">₹750</span>
                   <span class="text-[9px] text-slate-400">At delivery</span>
                 </div>
               </label>
@@ -736,7 +736,7 @@
                   <span class="payment-radio-dot w-3.5 h-3.5 rounded-full border border-zinc-600 bg-transparent flex items-center justify-center flex-shrink-0"></span>
                 </div>
                 <div class="mt-1.5 pt-1 border-t border-zinc-800/80 flex items-baseline justify-between">
-                  <span id="modalPrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,400</span>
+                  <span id="modalPrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹650</span>
                   <span id="modalPrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
                 </div>
               </label>
@@ -748,7 +748,7 @@
           <button type="submit" id="modalSubmitBtn" class="w-full cta-gold-btn shimmer rounded-2xl p-3.5 text-center cursor-pointer shadow-xl mt-2">
             <div class="text-xs sm:text-sm font-black text-slate-950 flex items-center justify-center space-x-2 uppercase tracking-wide">
               <i class="fa-solid fa-truck-fast"></i>
-              <span id="modalSubmitBtnText">CONFIRM CASH ON DELIVERY ORDER (₹1,500)</span>
+              <span id="modalSubmitBtnText">CONFIRM CASH ON DELIVERY ORDER (₹750)</span>
             </div>
           </button>
 
@@ -824,7 +824,7 @@
             </div>
             <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
               <span class="text-slate-400">Amount &amp; Method:</span>
-              <span id="successPaymentSummary" class="font-bold text-emerald-400">₹1,500 (COD)</span>
+              <span id="successPaymentSummary" class="font-bold text-emerald-400">₹750 (COD)</span>
             </div>
             <div class="pt-0.5">
               <span class="text-slate-400 block mb-0.5">Delivery Address:</span>
@@ -862,7 +862,7 @@
             <span>Order COD</span>
           </div>
           <div class="text-xs font-mono font-black text-white mt-0.5" id="mobileBottomCodPrice">
-            ₹1,500
+            ₹750
           </div>
         </button>
 
@@ -874,7 +874,7 @@
             <span class="bg-red-600 text-white text-[8px] font-extrabold px-1 rounded-sm ml-0.5">SAVE ₹100</span>
           </div>
           <div class="text-xs font-mono font-black text-slate-950 mt-0.5" id="mobileBottomOnlinePrice">
-            ₹1,400
+            ₹650
           </div>
         </button>
       </div>
@@ -907,21 +907,21 @@
   <script>
     document.getElementById("currentYearSpan").innerText = new Date().getFullYear();
 
-    // Actual pricing: COD is 1500/bottle. Prepaid is 1400 for 1 bottle; 2 bottles for 2600 (Save ₹400), and +1300 for each additional bottle
-    const COD_UNIT_PRICE = 1500;
-    const ORIGINAL_UNIT_PRICE = 3000;
+    // Actual pricing: COD is 750/bottle. Prepaid is 650 for 1 bottle; 2 bottles for 1200 (Save ₹300), and +600 for each additional bottle
+    const COD_UNIT_PRICE = 750;
+    const ORIGINAL_UNIT_PRICE = 1500;
     let selectedPaymentMethod = "COD"; // "COD" or "CASHFREE"
     let currentQty = 1;
     let currentSlide = 0;
     const totalSlides = 2;
 
     function getPrepaidTotal(qty) {
-      if (qty <= 1) return 1400;
-      return qty * 1300; // 2 bottles = 2600 (Save ₹400), 3 bottles = 3900 (2600+1300), etc.
+      if (qty <= 1) return 650;
+      return qty * 600; // 2 bottles = 1200 (Save ₹300), 3 bottles = 1800, etc.
     }
 
     function getCodTotal(qty) {
-      return qty * 1500;
+      return qty * 750;
     }
 
     function buyTwoPrepaidDeal() {
@@ -1098,7 +1098,7 @@
       if (displayDiscountEl) {
         if (isPrepaid) {
           if (currentQty >= 2) {
-            displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID: ₹1,300/BOTTLE • SAVE ₹${prepaidVsCodSavings.toLocaleString('en-IN')} EXTRA)`;
+            displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID: ₹600/BOTTLE • SAVE ₹${prepaidVsCodSavings.toLocaleString('en-IN')} EXTRA)`;
           } else {
             displayDiscountEl.innerText = `SAVE ₹${savings.toLocaleString('en-IN')} (PREPAID SPECIAL - ${discountPercent}% OFF)`;
           }
