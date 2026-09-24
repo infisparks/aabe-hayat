@@ -24,6 +24,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+  <!-- Meta Pixel Code (Asynchronous & Lightweight) -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1810710566617176');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1810710566617176&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Cashfree Checkout SDK v3 -->
@@ -1450,6 +1468,18 @@
         orderPayload.payment.otp_verified = true;
         orderPayload.payment.status = "PENDING_COD";
 
+        // Meta Pixel: Track Lead on verified COD OTP order placement
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', {
+            content_name: 'AAB-E-HAYAT Natural Botanical Juice',
+            content_category: 'Herbal Botanical Juice',
+            value: pendingCodOrder.total,
+            currency: 'INR',
+            order_id: orderPayload.order_id,
+            num_items: pendingCodOrder.quantity
+          });
+        }
+
         // 1. Save confirmed order to Database / Cloudflare Worker
         await saveOrderToDatabase(orderPayload);
 
@@ -1785,6 +1815,19 @@
             onlinePayload.payment.method = "CASHFREE";
             onlinePayload.payment.provider = "CASHFREE";
             onlinePayload.status = "CONFIRMED";
+
+            // Meta Pixel: Track Purchase (Payment Received) on online payment verification
+            if (typeof fbq === 'function') {
+              fbq('track', 'Purchase', {
+                content_name: 'AAB-E-HAYAT Natural Botanical Juice',
+                content_category: 'Herbal Botanical Juice',
+                value: total,
+                currency: 'INR',
+                order_id: orderId,
+                transaction_id: paymentId,
+                num_items: currentQty
+              });
+            }
 
             await saveOrderToDatabase(onlinePayload);
 
