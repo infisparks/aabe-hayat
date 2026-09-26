@@ -1471,9 +1471,9 @@
         orderPayload.payment.otp_verified = true;
         orderPayload.payment.status = "PENDING_COD";
 
-        // Meta Pixel: Track Lead on verified COD OTP order placement
+        // Meta Pixel: Track Purchase on verified COD OTP order placement
         if (typeof fbq === 'function') {
-          fbq('track', 'Lead', {
+          fbq('track', 'Purchase', {
             content_name: 'AAB-E-HAYAT Natural Botanical Juice',
             content_category: 'Herbal Botanical Juice',
             value: pendingCodOrder.total,
@@ -1607,6 +1607,18 @@
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add("opacity-75", "cursor-not-allowed");
+      }
+
+      // Meta Pixel: Track Lead immediately on form submission
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', {
+          content_name: 'AAB-E-HAYAT Natural Botanical Juice',
+          content_category: 'Herbal Botanical Juice',
+          value: total,
+          currency: 'INR',
+          order_id: orderId,
+          num_items: currentQty
+        });
       }
 
       if (selectedPaymentMethod === "COD") {

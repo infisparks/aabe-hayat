@@ -962,9 +962,23 @@
             setDatePreset('today');
         }
 
+        // Helper to extract local YYYY-MM-DD from order dates
+        function getOrderLocalDateString(rawDate) {
+            if (!rawDate) return '';
+            const d = new Date(rawDate);
+            if (isNaN(d.getTime())) return '';
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         // Fetch Orders and Metrics
         async function loadOrdersAndStats() {
             if (!currentAdminToken) return;
+
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
             const status = document.getElementById('filter-status').value;
             const provider = document.getElementById('filter-provider').value;
@@ -979,7 +993,7 @@
             if (startDate) queryParams.set('startDate', startDate);
             if (endDate) queryParams.set('endDate', endDate);
 
-            const WORKER_BASE = window.WORKER_API_URL || localStorage.getItem('WORKER_API_URL') || '';
+            const workerUrl = window.WORKER_API_URL || localStorage.getItem('WORKER_API_URL') || (typeof WORKER_BASE !== 'undefined' ? WORKER_BASE : '') || '';
 
             try {
                 let fetchedOrders = null;
@@ -987,7 +1001,7 @@
 
                 // 1. Try Cloudflare Worker / Backend API
                 try {
-                    const apiUrl = WORKER_BASE ? `${WORKER_BASE.replace(/\/$/, '')}/api/admin/orders?${queryParams.toString()}` : `/api/admin/orders?${queryParams.toString()}`;
+                    const apiUrl = workerUrl ? `${workerUrl.replace(/\/$/, '')}/api/admin/orders?${queryParams.toString()}` : `/api/admin/orders?${queryParams.toString()}`;
                     const ordersRes = await fetch(apiUrl, {
                         headers: { 
                             'Authorization': `Bearer ${currentAdminToken}`,
@@ -1012,37 +1026,90 @@
                     const fbRes = await fetch(`https://aabe-hayat-default-rtdb.firebaseio.com/orders.json?auth=${dbSecret}`);
                     if (fbRes.ok) {
                         const rawMap = await fbRes.json() || {};
-                        fetchedOrders = Object.values(rawMap).map(o => ({
-                            orderId: o.order_id || o.orderId,
-                            createdAt: o.created_at || o.order_date,
-                            customer: o.customer || o.shipping_address || {},
-                            product: o.product || {},
-                            items: o.items || (o.product ? [{ name: o.product.name, quantity: o.product.quantity, price: o.product.unit_price }] : []),
-                            pricing: o.pricing || { total: o.product?.total_amount || 0 },
-                            payment: o.payment || {},
-                            shipping: o.shipping || {},
-                            status: (o.status || 'PENDING_COD').toUpperCase()
-                        })).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-                        // Filter by status if selected
-                        if (status !== 'all') {
-                            fetchedOrders = fetchedOrders.filter(o => (o.status || '').toUpperCase() === status.toUpperCase());
-                        }
-
-                        // Search by query
-                        if (search) {
-                            const q = search.toLowerCase();
-                            fetchedOrders = fetchedOrders.filter(o => {
-                                const id = (o.orderId || '').toLowerCase();
-                                const name = (o.customer?.name || o.customer?.recipient_name || '').toLowerCase();
-                                const ph = (o.customer?.phone || '').toLowerCase();
-                                return id.includes(q) || name.includes(q) || ph.includes(q);
-                            });
-                        }
+                        fetchedOrders = Object.values(rawMap);
                     }
                 }
 
-                currentOrdersList = fetchedOrders || [];
+                // Unified normalization of order objects
+                let normalizedList = (fetchedOrders || []).map(o => ({
+                    orderId: o.order_id || o.orderId,
+                    createdAt: o.created_at || o.order_date || o.createdAt,
+                    customer: o.customer || o.shipping_address || {},
+                    product: o.product || {},
+                    items: o.items || (o.product ? [{ name: o.product.name, quantity: o.product.quantity || 1, price: o.product.unit_price }] : []),
+                    pricing: o.pricing || { total: Number(o.pricing?.total || o.product?.total_amount || o.payment?.amount || 0) },
+                    payment: o.payment || {},
+                    shipping: o.shipping || {},
+                    status: (o.status || 'PENDING_COD').toUpperCase(),
+                    events: o.events || []
+                })).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+                // Universal Client-side Filtering Pipeline
+                // 1. Date Range Filter
+                if (startDate || endDate) {
+                    normalizedList = normalizedList.filter(o => {
+                        const dStr = getOrderLocalDateString(o.createdAt);
+                        if (!dStr) return false;
+                        if (startDate && dStr < startDate) return false;
+                        if (endDate && dStr > endDate) return false;
+                        return true;
+                    });
+                }
+
+                // 2. Order Status Filter
+                if (status && status !== 'all') {
+                    const stUpper = status.toUpperCase();
+                    normalizedList = normalizedList.filter(o => {
+                        const os = (o.status || '').toUpperCase();
+                        const ps = (o.payment?.status || '').toUpperCase();
+                        const ss = (o.shipping?.status || '').toUpperCase();
+
+                        if (stUpper === 'OTP_NOT_VERIFIED') {
+                            return os === 'OTP_NOT_VERIFIED' || ps === 'OTP_NOT_VERIFIED' || ss === 'OTP_NOT_VERIFIED';
+                        }
+                        if (stUpper === 'DELIVERED') {
+                            return os === 'DELIVERED' || ss === 'DELIVERED';
+                        }
+                        if (stUpper === 'SHIPPED') {
+                            return os === 'SHIPPED' || ss === 'SHIPPED' || ss === 'IN_TRANSIT';
+                        }
+                        if (stUpper === 'PENDING_PAYMENT' || stUpper === 'PAYMENT_PENDING') {
+                            return os === 'PAYMENT_PENDING' || os === 'PENDING_PAYMENT' || ps === 'PAYMENT_PENDING' || ps === 'PENDING_PAYMENT' || ps === 'PENDING';
+                        }
+                        if (stUpper === 'CANCELLED') {
+                            return os === 'CANCELLED';
+                        }
+                        return os === stUpper || ps === stUpper || ss === stUpper;
+                    });
+                }
+
+                // 3. Payment Method Filter
+                if (provider && provider !== 'all') {
+                    const provLower = provider.toLowerCase();
+                    normalizedList = normalizedList.filter(o => {
+                        const isCod = getOrderIsCod(o);
+                        if (provLower === 'cod') return isCod;
+                        if (provLower === 'cashfree' || provLower === 'online') return !isCod;
+                        return true;
+                    });
+                }
+
+                // 4. Search Filter
+                if (search) {
+                    const q = search.toLowerCase();
+                    normalizedList = normalizedList.filter(o => {
+                        const id = String(o.orderId || '').toLowerCase();
+                        const name = String(o.customer?.name || o.customer?.recipient_name || '').toLowerCase();
+                        const ph = String(o.customer?.phone || '').toLowerCase();
+                        const city = String(o.customer?.city || '').toLowerCase();
+                        const pin = String(o.customer?.pincode || '').toLowerCase();
+                        const awb = String(o.shipping?.awb || o.shipping?.waybill || '').toLowerCase();
+                        const itemsStr = (o.items || []).map(i => `${i.name || ''} ${i.sku || ''}`).join(' ').toLowerCase();
+                        return id.includes(q) || name.includes(q) || ph.includes(q) || city.includes(q) || pin.includes(q) || awb.includes(q) || itemsStr.includes(q);
+                    });
+                }
+
+                currentOrdersList = normalizedList;
                 renderOrdersTable(currentOrdersList, fetchedSummary);
 
                 // Compute / Update Stats dynamically
