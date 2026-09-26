@@ -295,7 +295,7 @@
 
           <!-- Product Name in 1 Single Row on Mobile -->
           <h2 class="text-[15px] xs:text-base sm:text-2xl font-black text-white leading-tight whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
-            AAB-E-HAYAT™ Natural Botanical Juice (500ml)
+            AAB-E-HAYAT JUICE (500 ML)
           </h2>
           <p class="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
             Traditional Botanical Formulation • 65 Most Rich Natural Herbs &amp; Botanicals in One Refreshing Juice.
@@ -374,8 +374,8 @@
                 <span class="page-radio-dot w-3.5 h-3.5 rounded-full border border-zinc-600 bg-transparent flex items-center justify-center flex-shrink-0"></span>
               </div>
               <div class="flex items-baseline justify-between w-full">
-                <span id="pagePrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹999</span>
-                <span id="pagePrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Fast UPI</span>
+                <span id="pagePrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹899</span>
+                <span id="pagePrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
               </div>
             </button>
           </div>
@@ -395,7 +395,7 @@
             </button>
             <button onclick="openFastOrderModalWith('CASHFREE')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-emerald-400/60 text-emerald-400 font-bold py-2.5 px-2 rounded-xl text-[11px] sm:text-xs uppercase tracking-tight flex items-center justify-center space-x-1.5 transition-colors shadow cursor-pointer">
               <i class="fa-solid fa-bolt text-xs"></i>
-              <span>Pay Online (₹999)</span>
+              <span>Pay Online (₹899)</span>
             </button>
           </div>
 
@@ -417,7 +417,7 @@
                 </div>
               </div>
               <div class="text-right pl-2 flex-shrink-0">
-                <div class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,998</div>
+                <div class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹1,798</div>
                 <div class="text-[9px] text-slate-400 line-through">₹3,998</div>
               </div>
             </div>
@@ -628,7 +628,7 @@
         <div id="modalItemRecap" class="flex items-center space-x-2.5 bg-zinc-900/90 border border-zinc-800 p-2 sm:p-2.5 rounded-2xl mb-2.5">
           <img src="./image/1.png" onerror="this.src='./image/1.png'" alt="Aab-E-Hayat Juice" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl object-contain p-1 bg-zinc-950 border border-zinc-800 flex-shrink-0" />
           <div class="overflow-hidden flex-1">
-            <h5 class="text-xs font-black text-white truncate">AAB-E-HAYAT Natural Botanical Juice</h5>
+            <h5 class="text-xs font-black text-white truncate">AAB-E-HAYAT JUICE (500 ML)</h5>
             <p id="modalPackSummary" class="text-[10px] text-amber-400 font-bold">1 Bottle (500ml Net Volume)</p>
             <p class="text-amber-400 font-black text-xs"><span id="modalTotalSummary">₹999</span> <span id="modalQtySummary" class="text-[10px] text-slate-400 font-normal">(Qty: 1)</span></p>
           </div>
@@ -736,8 +736,8 @@
                   <span class="payment-radio-dot w-3.5 h-3.5 rounded-full border border-zinc-600 bg-transparent flex items-center justify-center flex-shrink-0"></span>
                 </div>
                 <div class="mt-1.5 pt-1 border-t border-zinc-800/80 flex items-baseline justify-between">
-                  <span id="modalPrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹999</span>
-                  <span id="modalPrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Fast UPI</span>
+                  <span id="modalPrepaidAmount" class="text-xs sm:text-sm font-black text-emerald-400 font-mono">₹899</span>
+                  <span id="modalPrepaidSaveBadge" class="text-[9px] text-emerald-300 font-bold">Save ₹100</span>
                 </div>
               </label>
 
@@ -820,7 +820,7 @@
             </div>
             <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
               <span class="text-slate-400">Item:</span>
-              <span id="successItemSummary" class="font-bold text-white">AAB-E-HAYAT Botanical Juice (500ml) x 1</span>
+              <span id="successItemSummary" class="font-bold text-white">AAB-E-HAYAT JUICE (500 ML) x 1</span>
             </div>
             <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
               <span class="text-slate-400">Amount &amp; Method:</span>
@@ -874,7 +874,7 @@
             <span class="bg-emerald-600 text-white text-[8px] font-extrabold px-1 rounded-sm ml-0.5">FAST</span>
           </div>
           <div class="text-xs font-mono font-black text-slate-950 mt-0.5" id="mobileBottomOnlinePrice">
-            ₹999
+            ₹899
           </div>
         </button>
       </div>
@@ -907,8 +907,9 @@
   <script>
     document.getElementById("currentYearSpan").innerText = new Date().getFullYear();
 
-    // Actual pricing: COD is 999/bottle. Prepaid is 999/bottle.
+    // Actual pricing: COD is 999/bottle. Prepaid is 899/bottle.
     const COD_UNIT_PRICE = 999;
+    const PREPAID_UNIT_PRICE = 899;
     const ORIGINAL_UNIT_PRICE = 1999;
     let selectedPaymentMethod = "COD"; // "COD" or "CASHFREE"
     let currentQty = 1;
@@ -916,7 +917,7 @@
     const totalSlides = 2;
 
     function getPrepaidTotal(qty) {
-      return qty * 999;
+      return qty * 899;
     }
 
     function getCodTotal(qty) {
@@ -1331,7 +1332,7 @@
       // 1. Browser Pixel Track with eventID for strict deduplication
       if (typeof fbq === 'function') {
         const pixelParams = {
-          content_name: 'AAB-E-HAYAT Natural Botanical Juice',
+          content_name: 'AAB-E-HAYAT JUICE (500 ML)',
           content_category: 'Herbal Botanical Juice',
           value: Number(data.value || data.total || 0),
           currency: 'INR',
@@ -1464,7 +1465,7 @@
       document.getElementById("otpErrorMsg").classList.add("hidden");
       document.getElementById("codOtpInput").value = "";
 
-      const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Juice*\n\nYour new Cash on Delivery (COD) verification code is: *${newOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your mobile number and confirm your order.\n📦 Amount to pay at delivery: ₹${pendingCodOrder.total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
+      const otpMsg = `🌿 *AAB-E-HAYAT JUICE (500 ML)*\n\nYour new Cash on Delivery (COD) verification code is: *${newOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your mobile number and confirm your order.\n📦 Amount to pay at delivery: ₹${pendingCodOrder.total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
       
       startOtpCountdown(30);
       await sendEvoWhatsAppMessage(pendingCodOrder.phone, otpMsg);
@@ -1549,7 +1550,7 @@
           `📦 *Order ID:* ${orderPayload.order_id}\n` +
           `👤 *Customer Name:* ${pendingCodOrder.name}\n` +
           `📞 *WhatsApp Mobile:* +91 ${pendingCodOrder.phone}\n` +
-          `🌿 *Product:* AAB-E-HAYAT™ Natural Botanical Juice (500ml)\n` +
+          `🌿 *Product:* AAB-E-HAYAT JUICE (500 ML)\n` +
           `🔢 *Quantity:* ${pendingCodOrder.quantity} Bottle(s)\n` +
           `💰 *Amount to Collect at Delivery:* ₹${pendingCodOrder.total.toLocaleString('en-IN')} (COD)\n` +
           `💵 *Payment Method:* Cash on Delivery (COD - OTP Verified ✅)\n\n` +
@@ -1592,7 +1593,7 @@
       document.getElementById("modalItemRecap").classList.add("hidden");
       
       document.getElementById("successOrderId").innerText = payload.order_id;
-      document.getElementById("successItemSummary").innerText = `AAB-E-HAYAT Juice (500ml) x ${payload.product.quantity} Bottle(s)`;
+      document.getElementById("successItemSummary").innerText = `AAB-E-HAYAT JUICE (500 ML) x ${payload.product.quantity} Bottle(s)`;
       const isCodMethod = (payload.payment?.method === 'COD' || payload.payment?.provider === 'COD');
       document.getElementById("successPaymentSummary").innerText = `₹${payload.product.total_amount.toLocaleString('en-IN')} (${isCodMethod ? 'Cash on Delivery' : 'Paid Online'})`;
       
@@ -1688,7 +1689,7 @@
           order_id: orderId,
           order_date: new Date().toISOString(),
           product: {
-            name: "AAB-E-HAYAT™ Natural Botanical Juice (500ml)",
+            name: "AAB-E-HAYAT JUICE (500 ML)",
             brand: "EMPIRE Global Herbal Science",
             sku: "AAB-HAYAT-500ML",
             volume: "500ml",
@@ -1741,7 +1742,7 @@
           total
         };
 
-        const otpMsg = `🌿 *AAB-E-HAYAT™ Botanical Juice*\n\nYour Cash on Delivery (COD) verification code is: *${generatedOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your WhatsApp number and confirm your order.\n📦 Amount to pay at delivery: ₹${total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
+        const otpMsg = `🌿 *AAB-E-HAYAT JUICE (500 ML)*\n\nYour Cash on Delivery (COD) verification code is: *${generatedOtp}*\n\n🔒 Please enter this 4-digit code on the checkout screen to verify your WhatsApp number and confirm your order.\n📦 Amount to pay at delivery: ₹${total.toLocaleString('en-IN')}\n\nDo not share this code with anyone.`;
         
         await sendEvoWhatsAppMessage(phone, otpMsg);
 
@@ -1770,7 +1771,7 @@
         order_id: orderId,
         order_date: new Date().toISOString(),
         product: {
-          name: "AAB-E-HAYAT™ Natural Botanical Juice (500ml)",
+          name: "AAB-E-HAYAT JUICE (500 ML)",
           brand: "EMPIRE Global Herbal Science",
           sku: "AAB-HAYAT-500ML",
           volume: "500ml",
@@ -1913,7 +1914,7 @@
               `💰 *Total Paid:* ₹${total.toLocaleString('en-IN')} (Online Verified - Prepaid Discount Applied)\n` +
               `👤 *Customer Name:* ${name}\n` +
               `📞 *WhatsApp Mobile:* +91 ${phone}\n` +
-              `🌿 *Product:* AAB-E-HAYAT Natural Botanical Juice (500ml)\n` +
+              `🌿 *Product:* AAB-E-HAYAT JUICE (500 ML)\n` +
               `🔢 *Quantity:* ${currentQty} Bottle(s)\n\n` +
               `📍 *SHIPPING & DELIVERY ADDRESS:*\n` +
               `🏠 ${houseNo}\n` +

@@ -1,6 +1,6 @@
 # 🌿 AAB-E-HAYAT™ Botanical Juice — Official Storefront & Cloudflare Worker
 
-A high-converting, mobile-first single-product e-commerce application for **AAB-E-HAYAT™ Natural Botanical Juice (500ml)** by Empire Global Herbal Science, backed by **Firebase Realtime Database** and a fast **Cloudflare Worker** serverless backend.
+A high-converting, mobile-first single-product e-commerce application for **AAB-E-HAYAT JUICE (500 ML)** by Empire Global Herbal Science, backed by **Firebase Realtime Database** and a fast **Cloudflare Worker** serverless backend.
 
 All environment variables and secrets are managed directly inside the **Cloudflare Dashboard**. There is **no separate `.env` file, no `package.json`, and no `wrangler.toml`** required.
 
